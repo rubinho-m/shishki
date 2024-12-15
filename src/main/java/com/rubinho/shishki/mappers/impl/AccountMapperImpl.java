@@ -44,6 +44,7 @@ public class AccountMapperImpl implements AccountMapper {
                 .id(account.getId())
                 .login(account.getLogin())
                 .role(account.getRole())
+                .guest(guestMapper.toDto(account.getGuest()))
                 .build();
     }
 

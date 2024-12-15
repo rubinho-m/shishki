@@ -13,4 +13,5 @@ public class RegisteredUserDto {
     private String login;
     private String token;
     private Role role;
+    private GuestDto guest;
 }
