@@ -77,4 +77,10 @@ public class AccountServiceImpl implements AccountService {
         return accountRepository.findByLogin(login)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "No such user"));
     }
+
+    @Override
+    public Account getAccountById(Long id) {
+        return accountRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "No such user"));
+    }
 }

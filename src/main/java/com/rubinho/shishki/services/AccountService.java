@@ -13,4 +13,5 @@ public interface AccountService {
 
     Account getAccountByToken(String token);
 
+    Account getAccountById(Long id);
 }

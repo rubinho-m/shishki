@@ -47,8 +47,8 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingResponseDto> getAllByAccountId(Long accountId) {
-        return bookingRepository.getAllBookingByAccount(accountId)
+    public List<BookingResponseDto> getAllByAccount(Account account) {
+        return bookingRepository.findAllByUser(account)
                 .stream()
                 .map(bookingMapper::toDto)
                 .toList();

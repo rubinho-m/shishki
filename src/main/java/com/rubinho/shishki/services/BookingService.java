@@ -9,7 +9,7 @@ import java.util.List;
 public interface BookingService {
     List<BookingResponseDto> getAll();
 
-    List<BookingResponseDto> getAllByAccountId(Long accountId);
+    List<BookingResponseDto> getAllByAccount(Account account);
 
     List<BookingResponseDto> getAllByGlamping(Long glampingId, Account account);
 
