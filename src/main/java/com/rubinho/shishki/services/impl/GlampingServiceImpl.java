@@ -1,9 +1,11 @@
 package com.rubinho.shishki.services.impl;
 
-import com.rubinho.shishki.dto.GlampingDto;
+import com.rubinho.shishki.dto.GlampingRequestDto;
+import com.rubinho.shishki.dto.GlampingResponseDto;
 import com.rubinho.shishki.mappers.GlampingMapper;
 import com.rubinho.shishki.model.Account;
 import com.rubinho.shishki.model.Glamping;
+import com.rubinho.shishki.model.GlampingStatus;
 import com.rubinho.shishki.model.Role;
 import com.rubinho.shishki.repository.GlampingRepository;
 import com.rubinho.shishki.services.GlampingService;
@@ -27,15 +29,15 @@ public class GlampingServiceImpl implements GlampingService {
     }
 
     @Override
-    public List<GlampingDto> getAll() {
-        return glampingRepository.findAll()
+    public List<GlampingResponseDto> getAll() {
+        return glampingRepository.findAllByGlampingStatus(GlampingStatus.APPROVED)
                 .stream()
                 .map(glampingMapper::toDto)
                 .toList();
     }
 
     @Override
-    public GlampingDto get(Long id) {
+    public GlampingResponseDto get(Long id) {
         return glampingMapper.toDto(
                 glampingRepository.findById(id)
                         .orElseThrow(
@@ -45,8 +47,9 @@ public class GlampingServiceImpl implements GlampingService {
     }
 
     @Override
-    public GlampingDto save(GlampingDto glampingDto, Account account) {
-        final Glamping glamping = glampingMapper.toEntity(glampingDto);
+    public GlampingResponseDto save(GlampingRequestDto glampingRequestDto, Account account) {
+        final Glamping glamping = glampingMapper.toEntity(glampingRequestDto);
+        glamping.setGlampingStatus(GlampingStatus.WAITING_FOR_CONFIRMATION);
         check(glamping, account);
         return glampingMapper.toDto(
                 glampingRepository.save(glamping)
@@ -54,9 +57,13 @@ public class GlampingServiceImpl implements GlampingService {
     }
 
     @Override
-    public GlampingDto edit(Long id, GlampingDto glampingDto, Account account) {
-        glampingDto.setId(id);
-        return save(glampingDto, account);
+    public GlampingResponseDto edit(Long id, GlampingRequestDto glampingRequestDto, Account account) {
+        glampingRequestDto.setId(id);
+        final Glamping glamping = glampingMapper.toEntity(glampingRequestDto);
+        check(glamping, account);
+        return glampingMapper.toDto(
+                glampingRepository.save(glamping)
+        );
     }
 
     @Override

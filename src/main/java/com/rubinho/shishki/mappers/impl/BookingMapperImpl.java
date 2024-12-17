@@ -84,7 +84,6 @@ public class BookingMapperImpl implements BookingMapper {
                 .findAllByIdIn(bookingRequestDto.getServices());
 
         return Booking.builder()
-                .id(bookingRequestDto.getId())
                 .user(user)
                 .house(house)
                 .dateStart(bookingRequestDto.getDateStart())

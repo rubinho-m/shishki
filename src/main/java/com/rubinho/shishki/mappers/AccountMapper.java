@@ -2,11 +2,12 @@ package com.rubinho.shishki.mappers;
 
 import com.rubinho.shishki.dto.AccountDto;
 import com.rubinho.shishki.dto.PotentialOwnerDto;
+import com.rubinho.shishki.dto.RegisterDto;
 import com.rubinho.shishki.dto.RegisteredUserDto;
 import com.rubinho.shishki.model.Account;
 
 public interface AccountMapper {
-    Account toEntity(AccountDto accountDto);
+    Account toEntity(RegisterDto registerDto);
 
     AccountDto toDto(Account account);
 

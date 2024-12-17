@@ -1,6 +1,7 @@
 package com.rubinho.shishki.rest;
 
-import com.rubinho.shishki.dto.GlampingDto;
+import com.rubinho.shishki.dto.GlampingRequestDto;
+import com.rubinho.shishki.dto.GlampingResponseDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,19 +15,19 @@ import java.util.List;
 
 public interface GlampingApi {
     @GetMapping("/glampings")
-    ResponseEntity<List<GlampingDto>> getAll();
+    ResponseEntity<List<GlampingResponseDto>> getAll();
 
     @GetMapping("/glampings/{id}")
-    ResponseEntity<GlampingDto> get(@PathVariable("id") Long id);
+    ResponseEntity<GlampingResponseDto> get(@PathVariable("id") Long id);
 
     @PostMapping("/glampings")
-    ResponseEntity<GlampingDto> add(@RequestBody GlampingDto glampingDto,
-                                    @RequestHeader("Authorization") String token);
+    ResponseEntity<GlampingResponseDto> add(@RequestBody GlampingRequestDto glampingRequestDto,
+                                           @RequestHeader("Authorization") String token);
 
     @PutMapping("/glampings/{id}")
-    ResponseEntity<GlampingDto> edit(@PathVariable("id") Long id,
-                                     @RequestBody GlampingDto newGlampingDto,
-                                     @RequestHeader("Authorization") String token);
+    ResponseEntity<GlampingResponseDto> edit(@PathVariable("id") Long id,
+                                            @RequestBody GlampingRequestDto newGlampingRequestDto,
+                                            @RequestHeader("Authorization") String token);
 
     @DeleteMapping("/glampings/{id}")
     ResponseEntity<Void> delete(@PathVariable("id") Long id, @RequestHeader("Authorization") String token);

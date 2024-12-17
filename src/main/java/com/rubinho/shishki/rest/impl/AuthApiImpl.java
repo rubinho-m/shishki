@@ -1,11 +1,11 @@
 package com.rubinho.shishki.rest.impl;
 
 import com.rubinho.shishki.dto.AccountDto;
+import com.rubinho.shishki.dto.RegisterDto;
 import com.rubinho.shishki.dto.RegisteredUserDto;
 import com.rubinho.shishki.rest.AuthApi;
 import com.rubinho.shishki.services.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,18 +19,12 @@ public class AuthApiImpl implements AuthApi {
     }
 
     @Override
-    public ResponseEntity<RegisteredUserDto> register(AccountDto accountDto) {
-        return ResponseEntity.ok(accountService.register(accountDto));
+    public ResponseEntity<RegisteredUserDto> register(RegisterDto registerDto) {
+        return ResponseEntity.ok(accountService.register(registerDto));
     }
 
     @Override
     public ResponseEntity<RegisteredUserDto> authorize(AccountDto accountDto) {
         return ResponseEntity.ok(accountService.authorize(accountDto));
-    }
-
-    @Override
-    public ResponseEntity<Void> requestOwnerRole(String token) {
-        accountService.requestOwnerRights(token);
-        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
     }
 }

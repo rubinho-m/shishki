@@ -1,6 +1,8 @@
 package com.rubinho.shishki.rest.impl;
 
+import com.rubinho.shishki.dto.GlampingResponseDto;
 import com.rubinho.shishki.dto.PotentialOwnerDto;
+import com.rubinho.shishki.model.GlampingStatus;
 import com.rubinho.shishki.model.Role;
 import com.rubinho.shishki.rest.AdminApi;
 import com.rubinho.shishki.services.AdminService;
@@ -22,6 +24,23 @@ public class AdminApiImpl implements AdminApi {
     @Override
     public ResponseEntity<List<PotentialOwnerDto>> getAllPotentialOwners() {
         return ResponseEntity.ok(adminService.getAllPotentialOwners());
+    }
+
+    @Override
+    public ResponseEntity<List<GlampingResponseDto>> getAllGlampingsForReview() {
+        return ResponseEntity.ok(adminService.getAllGlampingsForReview());
+    }
+
+    @Override
+    public ResponseEntity<Void> approveGlamping(Long id) {
+        adminService.setNewGlampingStatus(id, GlampingStatus.APPROVED);
+        return ResponseEntity.accepted().build();
+    }
+
+    @Override
+    public ResponseEntity<Void> rejectGlamping(Long id) {
+        adminService.setNewGlampingStatus(id, GlampingStatus.REJECTED);
+        return ResponseEntity.accepted().build();
     }
 
     @Override

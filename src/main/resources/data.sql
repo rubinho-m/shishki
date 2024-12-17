@@ -8,8 +8,8 @@ VALUES ('admin', '$2a$10$KgOvtVlh.KZkxKbLsPmDJOPPvCxguGgstDSMHqxFVYYxcygeflnvC',
        ('staff', 'staff', 3, 'STAFF'),
        ('testUser', 'testUser', 2, 'USER');
 
-INSERT INTO shishki_glampings (owner_id, address, description, photo_name)
-VALUES (1, 'Лесная улица, 10', 'Комфортабельные домики на природе.', 'test.jpg');
+INSERT INTO shishki_glampings (owner_id, address, description, photo_name, glamping_status)
+VALUES (1, 'Лесная улица, 10', 'Комфортабельные домики на природе.', 'test.jpg', 'APPROVED');
 
 INSERT INTO shishki_house_types (type, number_of_persons)
 VALUES ('A-frame', 6),

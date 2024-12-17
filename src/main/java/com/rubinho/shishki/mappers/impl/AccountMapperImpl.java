@@ -2,6 +2,7 @@ package com.rubinho.shishki.mappers.impl;
 
 import com.rubinho.shishki.dto.AccountDto;
 import com.rubinho.shishki.dto.PotentialOwnerDto;
+import com.rubinho.shishki.dto.RegisterDto;
 import com.rubinho.shishki.dto.RegisteredUserDto;
 import com.rubinho.shishki.mappers.AccountMapper;
 import com.rubinho.shishki.mappers.GuestMapper;
@@ -19,12 +20,13 @@ public class AccountMapperImpl implements AccountMapper {
     }
 
     @Override
-    public Account toEntity(AccountDto accountDto) {
+    public Account toEntity(RegisterDto registerDto) {
         return Account.builder()
-                .id(accountDto.getId())
-                .login(accountDto.getLogin())
-                .password(accountDto.getPassword())
-                .guest(guestMapper.toEntity(accountDto.getGuest()))
+                .id(registerDto.getId())
+                .login(registerDto.getLogin())
+                .password(registerDto.getPassword())
+                .guest(guestMapper.toEntity(registerDto.getGuest()))
+                .role(registerDto.getRole())
                 .build();
     }
 

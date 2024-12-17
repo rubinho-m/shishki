@@ -1,6 +1,7 @@
 package com.rubinho.shishki.services.impl;
 
 import com.rubinho.shishki.dto.AccountDto;
+import com.rubinho.shishki.dto.RegisterDto;
 import com.rubinho.shishki.dto.RegisteredUserDto;
 import com.rubinho.shishki.jwt.UserAuthProvider;
 import com.rubinho.shishki.mappers.AccountMapper;
@@ -39,10 +40,12 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public RegisteredUserDto register(AccountDto accountDto) {
-        final Account account = accountMapper.toEntity(accountDto);
-        account.setPassword(passwordEncoder.encode(CharBuffer.wrap(accountDto.getPassword())));
-        account.setRole(Role.USER);
+    public RegisteredUserDto register(RegisterDto registerDto) {
+        if (registerDto.getRole().equals(Role.ADMIN)){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+        final Account account = accountMapper.toEntity(registerDto);
+        account.setPassword(passwordEncoder.encode(CharBuffer.wrap(registerDto.getPassword())));
         guestRepository.save(account.getGuest());
         accountRepository.save(account);
         final RegisteredUserDto registeredUserDto = accountMapper.toRegisteredUserDto(account);
@@ -62,13 +65,6 @@ public class AccountServiceImpl implements AccountService {
         }
 
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Bad credentials");
-    }
-
-    @Override
-    public void requestOwnerRights(String token) {
-        final Account account = getAccountByToken(token);
-        account.setRole(Role.POTENTIAL_OWNER);
-        accountRepository.save(account);
     }
 
     @Override

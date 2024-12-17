@@ -1,18 +1,19 @@
 package com.rubinho.shishki.services;
 
-import com.rubinho.shishki.dto.GlampingDto;
+import com.rubinho.shishki.dto.GlampingRequestDto;
+import com.rubinho.shishki.dto.GlampingResponseDto;
 import com.rubinho.shishki.model.Account;
 
 import java.util.List;
 
 public interface GlampingService {
-    List<GlampingDto> getAll();
+    List<GlampingResponseDto> getAll();
 
-    GlampingDto get(Long id);
+    GlampingResponseDto get(Long id);
 
-    GlampingDto save(GlampingDto glampingDto, Account account);
+    GlampingResponseDto save(GlampingRequestDto glampingRequestDto, Account account);
 
-    GlampingDto edit(Long id, GlampingDto glampingDto, Account account);
+    GlampingResponseDto edit(Long id, GlampingRequestDto glampingRequestDto, Account account);
 
     void delete(Long id, Account account);
 }

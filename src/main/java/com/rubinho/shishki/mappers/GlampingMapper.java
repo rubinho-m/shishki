@@ -1,10 +1,11 @@
 package com.rubinho.shishki.mappers;
 
-import com.rubinho.shishki.dto.GlampingDto;
+import com.rubinho.shishki.dto.GlampingRequestDto;
+import com.rubinho.shishki.dto.GlampingResponseDto;
 import com.rubinho.shishki.model.Glamping;
 
 public interface GlampingMapper {
-    Glamping toEntity(GlampingDto glampingDto);
+    Glamping toEntity(GlampingRequestDto glampingRequestDto);
 
-    GlampingDto toDto(Glamping glamping);
+    GlampingResponseDto toDto(Glamping glamping);
 }

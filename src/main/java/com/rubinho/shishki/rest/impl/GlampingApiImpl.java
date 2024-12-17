@@ -1,6 +1,7 @@
 package com.rubinho.shishki.rest.impl;
 
-import com.rubinho.shishki.dto.GlampingDto;
+import com.rubinho.shishki.dto.GlampingRequestDto;
+import com.rubinho.shishki.dto.GlampingResponseDto;
 import com.rubinho.shishki.model.Account;
 import com.rubinho.shishki.rest.GlampingApi;
 import com.rubinho.shishki.services.AccountService;
@@ -29,31 +30,31 @@ public class GlampingApiImpl implements GlampingApi {
     }
 
     @Override
-    public ResponseEntity<List<GlampingDto>> getAll() {
+    public ResponseEntity<List<GlampingResponseDto>> getAll() {
         return ResponseEntity.ok(glampingService.getAll());
     }
 
     @Override
-    public ResponseEntity<GlampingDto> get(Long id) {
+    public ResponseEntity<GlampingResponseDto> get(Long id) {
         return ResponseEntity.ok(glampingService.get(id));
     }
 
     @Override
-    public ResponseEntity<GlampingDto> add(GlampingDto glampingDto, String token) {
+    public ResponseEntity<GlampingResponseDto> add(GlampingRequestDto glampingRequestDto, String token) {
         final Account account = accountService.getAccountByToken(token);
-        photoService.checkIfExists(glampingDto.getPhotoName());
+        photoService.checkIfExists(glampingRequestDto.getPhotoName());
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(glampingService.save(glampingDto, account));
+                .body(glampingService.save(glampingRequestDto, account));
     }
 
     @Override
-    public ResponseEntity<GlampingDto> edit(Long id, GlampingDto newGlampingDto, String token) {
+    public ResponseEntity<GlampingResponseDto> edit(Long id, GlampingRequestDto newGlampingRequestDto, String token) {
         final Account account = accountService.getAccountByToken(token);
-        photoService.checkIfExists(newGlampingDto.getPhotoName());
+        photoService.checkIfExists(newGlampingRequestDto.getPhotoName());
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
-                .body(glampingService.edit(id, newGlampingDto, account));
+                .body(glampingService.edit(id, newGlampingRequestDto, account));
     }
 
     @Override

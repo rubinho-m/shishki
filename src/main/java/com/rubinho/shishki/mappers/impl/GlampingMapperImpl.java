@@ -1,6 +1,7 @@
 package com.rubinho.shishki.mappers.impl;
 
-import com.rubinho.shishki.dto.GlampingDto;
+import com.rubinho.shishki.dto.GlampingRequestDto;
+import com.rubinho.shishki.dto.GlampingResponseDto;
 import com.rubinho.shishki.mappers.GlampingMapper;
 import com.rubinho.shishki.model.Account;
 import com.rubinho.shishki.model.Glamping;
@@ -20,26 +21,26 @@ public class GlampingMapperImpl implements GlampingMapper {
     }
 
     @Override
-    public Glamping toEntity(GlampingDto glampingDto) {
-        final Account account = accountRepository.findByLogin(glampingDto.getOwnerLogin())
+    public Glamping toEntity(GlampingRequestDto glampingRequestDto) {
+        final Account account = accountRepository.findByLogin(glampingRequestDto.getOwnerLogin())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found"));
         return Glamping.builder()
-                .id(glampingDto.getId())
-                .description(glampingDto.getDescription())
-                .address(glampingDto.getAddress())
+                .description(glampingRequestDto.getDescription())
+                .address(glampingRequestDto.getAddress())
                 .owner(account)
-                .photoName(glampingDto.getPhotoName())
+                .photoName(glampingRequestDto.getPhotoName())
                 .build();
     }
 
     @Override
-    public GlampingDto toDto(Glamping glamping) {
-        return GlampingDto.builder()
+    public GlampingResponseDto toDto(Glamping glamping) {
+        return GlampingResponseDto.builder()
                 .id(glamping.getId())
                 .description(glamping.getDescription())
                 .address(glamping.getAddress())
                 .ownerLogin(glamping.getOwner().getLogin())
                 .photoName(glamping.getPhotoName())
+                .status(glamping.getGlampingStatus())
                 .build();
     }
 }
