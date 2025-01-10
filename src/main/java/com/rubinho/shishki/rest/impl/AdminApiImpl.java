@@ -2,6 +2,7 @@ package com.rubinho.shishki.rest.impl;
 
 import com.rubinho.shishki.dto.GlampingResponseDto;
 import com.rubinho.shishki.dto.PotentialOwnerDto;
+import com.rubinho.shishki.dto.SecuredAccountDto;
 import com.rubinho.shishki.model.GlampingStatus;
 import com.rubinho.shishki.model.Role;
 import com.rubinho.shishki.rest.AdminApi;
@@ -24,6 +25,11 @@ public class AdminApiImpl implements AdminApi {
     @Override
     public ResponseEntity<List<PotentialOwnerDto>> getAllPotentialOwners() {
         return ResponseEntity.ok(adminService.getAllPotentialOwners());
+    }
+
+    @Override
+    public ResponseEntity<List<SecuredAccountDto>> getAllAccounts() {
+        return ResponseEntity.ok(adminService.getAllAccounts());
     }
 
     @Override

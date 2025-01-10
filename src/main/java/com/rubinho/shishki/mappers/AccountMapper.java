@@ -4,6 +4,7 @@ import com.rubinho.shishki.dto.AccountDto;
 import com.rubinho.shishki.dto.PotentialOwnerDto;
 import com.rubinho.shishki.dto.RegisterDto;
 import com.rubinho.shishki.dto.RegisteredUserDto;
+import com.rubinho.shishki.dto.SecuredAccountDto;
 import com.rubinho.shishki.model.Account;
 
 public interface AccountMapper {
@@ -14,4 +15,6 @@ public interface AccountMapper {
     RegisteredUserDto toRegisteredUserDto(Account account);
 
     PotentialOwnerDto toPotentialOwnerDto(Account account);
+
+    SecuredAccountDto toSecuredAccountDto(Account account);
 }

@@ -2,6 +2,7 @@ package com.rubinho.shishki.services.impl;
 
 import com.rubinho.shishki.dto.GlampingResponseDto;
 import com.rubinho.shishki.dto.PotentialOwnerDto;
+import com.rubinho.shishki.dto.SecuredAccountDto;
 import com.rubinho.shishki.mappers.AccountMapper;
 import com.rubinho.shishki.mappers.GlampingMapper;
 import com.rubinho.shishki.model.Account;
@@ -41,6 +42,14 @@ public class AdminServiceImpl implements AdminService {
         return accountRepository.findAllByRole(Role.POTENTIAL_OWNER)
                 .stream()
                 .map(accountMapper::toPotentialOwnerDto)
+                .toList();
+    }
+
+    @Override
+    public List<SecuredAccountDto> getAllAccounts() {
+        return accountRepository.findAll()
+                .stream()
+                .map(accountMapper::toSecuredAccountDto)
                 .toList();
     }
 

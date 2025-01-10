@@ -4,6 +4,7 @@ import com.rubinho.shishki.dto.AccountDto;
 import com.rubinho.shishki.dto.PotentialOwnerDto;
 import com.rubinho.shishki.dto.RegisterDto;
 import com.rubinho.shishki.dto.RegisteredUserDto;
+import com.rubinho.shishki.dto.SecuredAccountDto;
 import com.rubinho.shishki.mappers.AccountMapper;
 import com.rubinho.shishki.mappers.GuestMapper;
 import com.rubinho.shishki.model.Account;
@@ -55,6 +56,15 @@ public class AccountMapperImpl implements AccountMapper {
         return PotentialOwnerDto.builder()
                 .id(account.getId())
                 .login(account.getLogin())
+                .build();
+    }
+
+    @Override
+    public SecuredAccountDto toSecuredAccountDto(Account account) {
+        return SecuredAccountDto.builder()
+                .id(account.getId())
+                .login(account.getLogin())
+                .role(account.getRole())
                 .build();
     }
 }
