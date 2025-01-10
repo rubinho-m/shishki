@@ -9,6 +9,8 @@ import java.util.List;
 public interface GlampingService {
     List<GlampingResponseDto> getAll();
 
+    List<GlampingResponseDto> getAllApproved();
+
     GlampingResponseDto get(Long id);
 
     GlampingResponseDto save(GlampingRequestDto glampingRequestDto, Account account);

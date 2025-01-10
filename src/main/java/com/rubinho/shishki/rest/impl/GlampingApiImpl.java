@@ -35,6 +35,11 @@ public class GlampingApiImpl implements GlampingApi {
     }
 
     @Override
+    public ResponseEntity<List<GlampingResponseDto>> getAllApproved() {
+        return ResponseEntity.ok(glampingService.getAllApproved());
+    }
+
+    @Override
     public ResponseEntity<GlampingResponseDto> get(Long id) {
         return ResponseEntity.ok(glampingService.get(id));
     }

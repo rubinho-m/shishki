@@ -17,6 +17,9 @@ public interface GlampingApi {
     @GetMapping("/glampings")
     ResponseEntity<List<GlampingResponseDto>> getAll();
 
+    @GetMapping("/glampings/approved")
+    ResponseEntity<List<GlampingResponseDto>> getAllApproved();
+
     @GetMapping("/glampings/{id}")
     ResponseEntity<GlampingResponseDto> get(@PathVariable("id") Long id);
 

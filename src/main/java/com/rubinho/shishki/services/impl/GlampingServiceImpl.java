@@ -30,6 +30,14 @@ public class GlampingServiceImpl implements GlampingService {
 
     @Override
     public List<GlampingResponseDto> getAll() {
+        return glampingRepository.findAll()
+                .stream()
+                .map(glampingMapper::toDto)
+                .toList();
+    }
+
+    @Override
+    public List<GlampingResponseDto> getAllApproved() {
         return glampingRepository.findAllByGlampingStatus(GlampingStatus.APPROVED)
                 .stream()
                 .map(glampingMapper::toDto)
@@ -75,10 +83,10 @@ public class GlampingServiceImpl implements GlampingService {
     }
 
     void check(Glamping glamping, Account account) {
-        if (account.getRole().equals(Role.ADMIN)){
+        if (account.getRole().equals(Role.ADMIN)) {
             return;
         }
-        if (!glamping.getOwner().equals(account)){
+        if (!glamping.getOwner().equals(account)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not the owner of the glamping");
         }
     }
