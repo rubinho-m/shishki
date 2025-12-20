@@ -1,11 +1,14 @@
 package com.rubinho.shishki.services.impl;
 
+import com.rubinho.shishki.enums.StorageType;
 import com.rubinho.shishki.model.Account;
 import com.rubinho.shishki.model.PhotoOwner;
 import com.rubinho.shishki.model.Role;
 import com.rubinho.shishki.repository.PhotoOwnerRepository;
+import com.rubinho.shishki.repository.PhotoRepository;
+import com.rubinho.shishki.repository.impl.FSPhotoRepository;
+import com.rubinho.shishki.repository.impl.S3PhotoRepository;
 import com.rubinho.shishki.services.PhotoService;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -14,29 +17,26 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 
 @Service
 public class PhotoServiceImpl implements PhotoService {
-    private final static Path PATH = Paths.get("src/main/resources/images");
-    private final static String JPG = ".jpg";
-
+    private final FSPhotoRepository fsPhotoRepository;
+    private final S3PhotoRepository s3PhotoRepository;
     private final PhotoOwnerRepository photoOwnerRepository;
 
     @Autowired
-    public PhotoServiceImpl(PhotoOwnerRepository photoOwnerRepository) throws IOException {
+    public PhotoServiceImpl(FSPhotoRepository fsPhotoRepository,
+                            S3PhotoRepository s3PhotoRepository,
+                            PhotoOwnerRepository photoOwnerRepository) {
+        this.fsPhotoRepository = fsPhotoRepository;
+        this.s3PhotoRepository = s3PhotoRepository;
         this.photoOwnerRepository = photoOwnerRepository;
-        Files.createDirectories(PATH);
     }
 
     @Override
     @Transactional
-    public String upload(MultipartFile file, Account account) {
-        final String fileName = RandomStringUtils.random(6, true, false) + JPG;
-        save(fileName, file);
+    public String upload(StorageType storageType, MultipartFile file, Account account) {
+        final String fileName = getPhotoRepository(storageType).save(file);
         photoOwnerRepository.save(
                 PhotoOwner.builder()
                         .fileName(fileName)
@@ -47,55 +47,34 @@ public class PhotoServiceImpl implements PhotoService {
     }
 
     @Override
-    public String replace(String fileName, MultipartFile file, Account account) {
+    public String replace(StorageType storageType, String fileName, MultipartFile file, Account account) {
         checkAccount(fileName, account);
-        save(fileName, file);
-        return fileName;
+        return getPhotoRepository(storageType).edit(fileName, file);
     }
 
     @Override
-    public byte[] download(String fileName) {
-        final Path imagePath = PATH.resolve(fileName);
-
-        if (Files.exists(imagePath)) {
-            try {
-                return Files.readAllBytes(imagePath);
-            } catch (IOException e) {
-                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Couldn't download file", e);
-            }
-        } else {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No image with this file name");
-        }
+    public byte[] download(StorageType storageType, String fileName) throws IOException {
+        return getPhotoRepository(storageType).get(fileName);
     }
 
     @Override
-    public void delete(String fileName) {
-        final Path imagePath = PATH.resolve(fileName);
-        try {
-            Files.deleteIfExists(imagePath);
-        } catch (IOException e) {
-            throw new ResponseStatusException(
-                    HttpStatus.INTERNAL_SERVER_ERROR,
-                    "Couldn't delete image: %s".formatted(fileName)
-            );
-        }
+    public void delete(StorageType storageType, String fileName, Account account) {
+        checkAccount(fileName, account);
+        getPhotoRepository(storageType).delete(fileName);
     }
 
     @Override
-    public void checkIfExists(String fileName) {
-        final Path imagePath = PATH.resolve(fileName);
-        if (Files.notExists(imagePath)) {
+    public void checkIfExists(StorageType storageType, String fileName) {
+        if (!getPhotoRepository(storageType).exists(fileName)) {
             throw new IllegalStateException("File: %s doesn't exist".formatted(fileName));
         }
     }
 
-    private void save(String fileName, MultipartFile file) {
-        try {
-            final Path filePath = PATH.resolve(fileName);
-            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Couldn't save file", e);
-        }
+    private PhotoRepository getPhotoRepository(StorageType storageType) {
+        return switch (storageType) {
+            case FS -> fsPhotoRepository;
+            case S3 -> s3PhotoRepository;
+        };
     }
 
     private void checkAccount(String fileName, Account account) {
