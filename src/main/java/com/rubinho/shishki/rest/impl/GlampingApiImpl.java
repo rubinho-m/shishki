@@ -4,9 +4,11 @@ import com.rubinho.shishki.dto.GlampingRequestDto;
 import com.rubinho.shishki.dto.GlampingResponseDto;
 import com.rubinho.shishki.model.Account;
 import com.rubinho.shishki.rest.GlampingApi;
+import com.rubinho.shishki.rest.versions.ApiVersioningUtils;
 import com.rubinho.shishki.services.AccountService;
 import com.rubinho.shishki.services.GlampingService;
 import com.rubinho.shishki.services.PhotoService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,14 +21,17 @@ public class GlampingApiImpl implements GlampingApi {
     private final GlampingService glampingService;
     private final AccountService accountService;
     private final PhotoService photoService;
+    private final ApiVersioningUtils apiVersioningUtils;
 
     @Autowired
     public GlampingApiImpl(GlampingService glampingService,
                            AccountService accountService,
-                           PhotoService photoService) {
+                           PhotoService photoService,
+                           ApiVersioningUtils apiVersioningUtils) {
         this.glampingService = glampingService;
         this.accountService = accountService;
         this.photoService = photoService;
+        this.apiVersioningUtils = apiVersioningUtils;
     }
 
     @Override
@@ -45,18 +50,29 @@ public class GlampingApiImpl implements GlampingApi {
     }
 
     @Override
-    public ResponseEntity<GlampingResponseDto> add(GlampingRequestDto glampingRequestDto, String token) {
+    public ResponseEntity<GlampingResponseDto> add(HttpServletRequest httpServletRequest,
+                                                   GlampingRequestDto glampingRequestDto,
+                                                   String token) {
         final Account account = accountService.getAccountByToken(token);
-        photoService.checkIfExists(glampingRequestDto.getPhotoName());
+        photoService.checkIfExists(
+                apiVersioningUtils.storageType(httpServletRequest.getRequestURI()),
+                glampingRequestDto.getPhotoName()
+        );
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(glampingService.save(glampingRequestDto, account));
     }
 
     @Override
-    public ResponseEntity<GlampingResponseDto> edit(Long id, GlampingRequestDto newGlampingRequestDto, String token) {
+    public ResponseEntity<GlampingResponseDto> edit(HttpServletRequest httpServletRequest,
+                                                    Long id,
+                                                    GlampingRequestDto newGlampingRequestDto,
+                                                    String token) {
         final Account account = accountService.getAccountByToken(token);
-        photoService.checkIfExists(newGlampingRequestDto.getPhotoName());
+        photoService.checkIfExists(
+                apiVersioningUtils.storageType(httpServletRequest.getRequestURI()),
+                newGlampingRequestDto.getPhotoName()
+        );
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
                 .body(glampingService.edit(id, newGlampingRequestDto, account));

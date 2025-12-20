@@ -1,4 +1,4 @@
-package com.rubinho.shishki.rest.impl;
+package com.rubinho.shishki.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

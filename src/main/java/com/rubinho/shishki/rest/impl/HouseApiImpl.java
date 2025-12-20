@@ -7,9 +7,11 @@ import com.rubinho.shishki.model.Glamping;
 import com.rubinho.shishki.model.HouseStatus;
 import com.rubinho.shishki.model.HouseType;
 import com.rubinho.shishki.rest.HouseApi;
+import com.rubinho.shishki.rest.versions.ApiVersioningUtils;
 import com.rubinho.shishki.services.AccountService;
 import com.rubinho.shishki.services.HouseService;
 import com.rubinho.shishki.services.PhotoService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,14 +26,17 @@ public class HouseApiImpl implements HouseApi {
     private final HouseService houseService;
     private final AccountService accountService;
     private final PhotoService photoService;
+    private final ApiVersioningUtils apiVersioningUtils;
 
     @Autowired
     public HouseApiImpl(HouseService houseService,
                         AccountService accountService,
-                        PhotoService photoService) {
+                        PhotoService photoService,
+                        ApiVersioningUtils apiVersioningUtils) {
         this.houseService = houseService;
         this.accountService = accountService;
         this.photoService = photoService;
+        this.apiVersioningUtils = apiVersioningUtils;
     }
 
     @Override
@@ -65,18 +70,29 @@ public class HouseApiImpl implements HouseApi {
     }
 
     @Override
-    public ResponseEntity<HouseDto> add(HouseDto houseDto, String token) {
+    public ResponseEntity<HouseDto> add(HttpServletRequest httpServletRequest,
+                                        HouseDto houseDto,
+                                        String token) {
         final Account account = accountService.getAccountByToken(token);
-        photoService.checkIfExists(houseDto.getPhotoName());
+        photoService.checkIfExists(
+                apiVersioningUtils.storageType(httpServletRequest.getRequestURI()),
+                houseDto.getPhotoName()
+        );
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(houseService.save(houseDto, account));
     }
 
     @Override
-    public ResponseEntity<HouseDto> edit(Long id, HouseDto newHouseDto, String token) {
+    public ResponseEntity<HouseDto> edit(HttpServletRequest httpServletRequest,
+                                         Long id,
+                                         HouseDto newHouseDto,
+                                         String token) {
         final Account account = accountService.getAccountByToken(token);
-        photoService.checkIfExists(newHouseDto.getPhotoName());
+        photoService.checkIfExists(
+                apiVersioningUtils.storageType(httpServletRequest.getRequestURI()),
+                newHouseDto.getPhotoName()
+        );
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
                 .body(houseService.edit(id, newHouseDto, account));

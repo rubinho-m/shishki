@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.nio.CharBuffer;
+import java.util.Set;
 
 @Service
 public class AccountServiceImpl implements AccountService {
@@ -25,6 +26,8 @@ public class AccountServiceImpl implements AccountService {
     private final AccountRepository accountRepository;
     private final AccountMapper accountMapper;
     private final PasswordEncoder passwordEncoder;
+
+    private final Set<Role> ALLOWED_REGISTERING_ROLES = Set.of(Role.USER, Role.OWNER);
 
     @Autowired
     public AccountServiceImpl(UserAuthProvider userAuthProvider,
@@ -41,7 +44,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public RegisteredUserDto register(RegisterDto registerDto) {
-        if (registerDto.getRole().equals(Role.ADMIN)){
+        if (!ALLOWED_REGISTERING_ROLES.contains(registerDto.getRole())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
         final Account account = accountMapper.toEntity(registerDto);

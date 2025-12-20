@@ -1,6 +1,7 @@
 package com.rubinho.shishki.rest;
 
 import com.rubinho.shishki.dto.GuestDto;
+import com.rubinho.shishki.rest.versions.ApiVersioned;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import java.util.List;
 import java.util.Set;
 
+@ApiVersioned(path = {"/api/v1", "/api/v2"})
 public interface GuestApi {
     @GetMapping("/guests")
     ResponseEntity<List<GuestDto>> getAll();
@@ -21,15 +23,15 @@ public interface GuestApi {
     ResponseEntity<Set<GuestDto>> getAllByAccount(@RequestHeader("Authorization") String token);
 
     @GetMapping("/guests/{id}")
-    ResponseEntity<GuestDto> get(@PathVariable("id") Long id);
+    ResponseEntity<GuestDto> get(@PathVariable Long id);
 
     @PostMapping("/guests")
     ResponseEntity<GuestDto> add(@RequestBody GuestDto guestDto);
 
     @PutMapping("/guests/{id}")
-    ResponseEntity<GuestDto> edit(@PathVariable("id") Long id,
+    ResponseEntity<GuestDto> edit(@PathVariable Long id,
                                   @RequestBody GuestDto newGuestDto);
 
     @DeleteMapping("/guests/{id}")
-    ResponseEntity<Void> delete(@PathVariable("id") Long id);
+    ResponseEntity<Void> delete(@PathVariable Long id);
 }

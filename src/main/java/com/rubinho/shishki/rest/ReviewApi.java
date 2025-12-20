@@ -1,6 +1,7 @@
 package com.rubinho.shishki.rest;
 
 import com.rubinho.shishki.dto.ReviewDto;
+import com.rubinho.shishki.rest.versions.ApiVersioned;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,24 +13,24 @@ import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.util.List;
 
+@ApiVersioned(path = {"/api/v1", "/api/v2"})
 public interface ReviewApi {
     @GetMapping("/reviews")
     ResponseEntity<List<ReviewDto>> getAll();
 
     @GetMapping("/reviews/{id}")
-    ResponseEntity<ReviewDto> get(@PathVariable("id") Long id);
+    ResponseEntity<ReviewDto> get(@PathVariable Long id);
 
     @PostMapping("/reviews")
-    ResponseEntity<ReviewDto> add(@RequestBody ReviewDto reviewDto, @RequestHeader("Authorization") String token);
+    ResponseEntity<ReviewDto> add(@RequestBody ReviewDto reviewDto,
+                                  @RequestHeader("Authorization") String token);
 
     @PutMapping("/reviews/{id}")
-    ResponseEntity<ReviewDto> edit(@PathVariable("id") Long id,
+    ResponseEntity<ReviewDto> edit(@PathVariable Long id,
                                    @RequestBody ReviewDto newReviewDto,
-                                   @RequestHeader("Authorization") String token
-    );
+                                   @RequestHeader("Authorization") String token);
 
     @DeleteMapping("/reviews/{id}")
-    ResponseEntity<Void> delete(@PathVariable("id") Long id,
-                                @RequestHeader("Authorization") String token)
-            ;
+    ResponseEntity<Void> delete(@PathVariable Long id,
+                                @RequestHeader("Authorization") String token);
 }

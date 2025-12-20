@@ -1,6 +1,7 @@
 package com.rubinho.shishki.rest;
 
 import com.rubinho.shishki.dto.AdditionalServiceDto;
+import com.rubinho.shishki.rest.versions.ApiVersioned;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,20 +12,21 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
+@ApiVersioned(path = {"/api/v1", "/api/v2"})
 public interface AdditionalServiceApi {
     @GetMapping("/services")
     ResponseEntity<List<AdditionalServiceDto>> getAll();
 
     @GetMapping("/services/{id}")
-    ResponseEntity<AdditionalServiceDto> get(@PathVariable("id") Long id);
+    ResponseEntity<AdditionalServiceDto> get(@PathVariable Long id);
 
     @PostMapping("/services")
     ResponseEntity<AdditionalServiceDto> add(@RequestBody AdditionalServiceDto additionalServiceDto);
 
     @PutMapping("/services/{id}")
-    ResponseEntity<AdditionalServiceDto> edit(@PathVariable("id") Long id,
+    ResponseEntity<AdditionalServiceDto> edit(@PathVariable Long id,
                                               @RequestBody AdditionalServiceDto newAdditionalServiceDto);
 
     @DeleteMapping("/services/{id}")
-    ResponseEntity<Void> delete(@PathVariable("id") Long id);
+    ResponseEntity<Void> delete(@PathVariable Long id);
 }

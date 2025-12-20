@@ -8,6 +8,7 @@ import com.rubinho.shishki.dto.SecuredAccountDto;
 import com.rubinho.shishki.mappers.AccountMapper;
 import com.rubinho.shishki.mappers.GuestMapper;
 import com.rubinho.shishki.model.Account;
+import com.rubinho.shishki.model.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

@@ -2,6 +2,8 @@ package com.rubinho.shishki.rest;
 
 import com.rubinho.shishki.dto.GlampingRequestDto;
 import com.rubinho.shishki.dto.GlampingResponseDto;
+import com.rubinho.shishki.rest.versions.ApiVersioned;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.util.List;
 
+@ApiVersioned(path = {"/api/v1", "/api/v2"})
 public interface GlampingApi {
     @GetMapping("/glampings")
     ResponseEntity<List<GlampingResponseDto>> getAll();
@@ -21,17 +24,19 @@ public interface GlampingApi {
     ResponseEntity<List<GlampingResponseDto>> getAllApproved();
 
     @GetMapping("/glampings/{id}")
-    ResponseEntity<GlampingResponseDto> get(@PathVariable("id") Long id);
+    ResponseEntity<GlampingResponseDto> get(@PathVariable Long id);
 
     @PostMapping("/glampings")
-    ResponseEntity<GlampingResponseDto> add(@RequestBody GlampingRequestDto glampingRequestDto,
-                                           @RequestHeader("Authorization") String token);
-
-    @PutMapping("/glampings/{id}")
-    ResponseEntity<GlampingResponseDto> edit(@PathVariable("id") Long id,
-                                            @RequestBody GlampingRequestDto newGlampingRequestDto,
+    ResponseEntity<GlampingResponseDto> add(HttpServletRequest httpServletRequest,
+                                            @RequestBody GlampingRequestDto glampingRequestDto,
                                             @RequestHeader("Authorization") String token);
 
+    @PutMapping("/glampings/{id}")
+    ResponseEntity<GlampingResponseDto> edit(HttpServletRequest httpServletRequest,
+                                             @PathVariable Long id,
+                                             @RequestBody GlampingRequestDto newGlampingRequestDto,
+                                             @RequestHeader("Authorization") String token);
+
     @DeleteMapping("/glampings/{id}")
-    ResponseEntity<Void> delete(@PathVariable("id") Long id, @RequestHeader("Authorization") String token);
+    ResponseEntity<Void> delete(@PathVariable Long id, @RequestHeader("Authorization") String token);
 }
