@@ -24,7 +24,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
 @Configuration
-@EnableWebSecurity(debug = true)
+@EnableWebSecurity
 public class SecurityConfiguration {
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final UserAuthProvider userAuthProvider;
@@ -57,6 +57,7 @@ public class SecurityConfiguration {
 
                         .requestMatchers("/register").permitAll()
                         .requestMatchers("/login").permitAll()
+                        .requestMatchers("/api/**").permitAll()
 
                         .requestMatchers(HttpMethod.GET, "/glampings/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/bookings/**").authenticated()
