@@ -14,6 +14,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 @Repository
+@Deprecated(since = "v2")
 public class FSPhotoRepository implements PhotoRepository {
     private final static Path PATH = Paths.get("src/main/resources/images");
     private final static String JPG = ".jpg";

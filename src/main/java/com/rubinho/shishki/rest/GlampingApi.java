@@ -21,7 +21,7 @@ import java.util.List;
 @ApiVersioned(path = {"/api/v1", "/api/v2"})
 public interface GlampingApi {
     @GetMapping("/glampings")
-    @AdminAuthorization
+    @NoAuth
     ResponseEntity<List<GlampingResponseDto>> getAll();
 
     @GetMapping("/glampings/approved")
@@ -33,7 +33,7 @@ public interface GlampingApi {
     ResponseEntity<GlampingResponseDto> get(@PathVariable Long id);
 
     @PostMapping("/glampings")
-    @OwnerAuthorization
+    @NoAuth
     ResponseEntity<GlampingResponseDto> add(HttpServletRequest httpServletRequest,
                                             @RequestBody GlampingRequestDto glampingRequestDto,
                                             @RequestHeader("Authorization") String token);
