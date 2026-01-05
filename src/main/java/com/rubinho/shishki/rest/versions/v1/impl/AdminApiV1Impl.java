@@ -3,6 +3,7 @@ package com.rubinho.shishki.rest.versions.v1.impl;
 import com.rubinho.shishki.dto.GlampingResponseDto;
 import com.rubinho.shishki.dto.PotentialOwnerDto;
 import com.rubinho.shishki.dto.SecuredAccountDto;
+import com.rubinho.shishki.exceptions.NotFoundException;
 import com.rubinho.shishki.model.GlampingStatus;
 import com.rubinho.shishki.model.Role;
 import com.rubinho.shishki.rest.versions.v1.AdminApiV1;
@@ -39,37 +40,49 @@ public class AdminApiV1Impl implements AdminApiV1 {
 
     @Override
     public ResponseEntity<Void> approveGlamping(Long id) {
-        adminService.setNewGlampingStatus(id, GlampingStatus.APPROVED);
+        setNewGlampingStatus(id, GlampingStatus.APPROVED);
         return ResponseEntity.accepted().build();
     }
 
     @Override
     public ResponseEntity<Void> rejectGlamping(Long id) {
-        adminService.setNewGlampingStatus(id, GlampingStatus.REJECTED);
+        setNewGlampingStatus(id, GlampingStatus.REJECTED);
         return ResponseEntity.accepted().build();
     }
 
     @Override
     public ResponseEntity<Void> addOwner(Long id) {
-        adminService.setNewRole(id, Role.OWNER);
+        setNewRole(id, Role.OWNER);
         return ResponseEntity.accepted().build();
     }
 
     @Override
     public ResponseEntity<Void> addUser(Long id) {
-        adminService.setNewRole(id, Role.USER);
+        setNewRole(id, Role.USER);
         return ResponseEntity.accepted().build();
     }
 
     @Override
     public ResponseEntity<Void> addStaff(Long id) {
-        adminService.setNewRole(id, Role.STAFF);
+        setNewRole(id, Role.STAFF);
         return ResponseEntity.accepted().build();
     }
 
     @Override
     public ResponseEntity<Void> addAdmin(Long id) {
-        adminService.setNewRole(id, Role.ADMIN);
+        setNewRole(id, Role.ADMIN);
         return ResponseEntity.accepted().build();
+    }
+
+    private void setNewRole(Long id, Role role) {
+        if (adminService.setNewRole(id, role).isEmpty()) {
+            throw new NotFoundException("Account with id %d not found".formatted(id));
+        }
+    }
+
+    private void setNewGlampingStatus(Long id, GlampingStatus glampingStatus) {
+        if (adminService.setNewGlampingStatus(id, glampingStatus).isEmpty()) {
+            throw new NotFoundException("Glamping with id %d not found".formatted(id));
+        }
     }
 }

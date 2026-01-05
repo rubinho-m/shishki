@@ -1,6 +1,8 @@
 package com.rubinho.shishki.rest.impl;
 
 import com.rubinho.shishki.dto.ShopItemDto;
+import com.rubinho.shishki.exceptions.BadRequestException;
+import com.rubinho.shishki.exceptions.NotFoundException;
 import com.rubinho.shishki.rest.ShopItemApi;
 import com.rubinho.shishki.services.ShopItemService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,7 +10,6 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -28,7 +29,11 @@ public class ShopItemApiImpl implements ShopItemApi {
 
     @Override
     public ResponseEntity<ShopItemDto> get(Long id) {
-        return ResponseEntity.ok(shopItemService.get(id));
+        return ResponseEntity.ok(
+                shopItemService.get(id).orElseThrow(
+                        () -> new NotFoundException("Shop item with id %d not found".formatted(id))
+                )
+        );
     }
 
     @Override
@@ -38,8 +43,7 @@ public class ShopItemApiImpl implements ShopItemApi {
                     .status(HttpStatus.CREATED)
                     .body(shopItemService.save(shopItemDto));
         } catch (DataIntegrityViolationException e) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
+            throw new BadRequestException(
                     "Shop item with name: %s already exists".formatted(shopItemDto.getName())
             );
         }
@@ -48,12 +52,13 @@ public class ShopItemApiImpl implements ShopItemApi {
     @Override
     public ResponseEntity<ShopItemDto> edit(Long id, ShopItemDto newShopItemDto) {
         try {
+            final ShopItemDto shopItemDto = shopItemService.edit(id, newShopItemDto)
+                    .orElseThrow(() -> new NotFoundException("Shop item with id %d not found".formatted(id)));
             return ResponseEntity
                     .status(HttpStatus.ACCEPTED)
-                    .body(shopItemService.edit(id, newShopItemDto));
+                    .body(shopItemDto);
         } catch (DataIntegrityViolationException e) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
+            throw new BadRequestException(
                     "Shop item with name: %s already exists".formatted(newShopItemDto.getName())
             );
         }

@@ -1,6 +1,8 @@
 package com.rubinho.shishki.rest.impl;
 
 import com.rubinho.shishki.dto.PhotoDto;
+import com.rubinho.shishki.exceptions.UnauthorizedException;
+import com.rubinho.shishki.model.Account;
 import com.rubinho.shishki.rest.PhotoApi;
 import com.rubinho.shishki.rest.versions.ApiVersioningUtils;
 import com.rubinho.shishki.services.AccountService;
@@ -54,7 +56,7 @@ public class PhotoApiImpl implements PhotoApi {
                         photoService.upload(
                                 apiVersioningUtils.storageType(httpServletRequest.getRequestURI()),
                                 file,
-                                accountService.getAccountByToken(token)
+                                getAccount(token)
                         )
                 )
                 .build();
@@ -71,7 +73,7 @@ public class PhotoApiImpl implements PhotoApi {
                                 apiVersioningUtils.storageType(httpServletRequest.getRequestURI()),
                                 fileName,
                                 file,
-                                accountService.getAccountByToken(token)
+                                getAccount(token)
                         )
                 )
                 .build();
@@ -85,8 +87,13 @@ public class PhotoApiImpl implements PhotoApi {
         photoService.delete(
                 apiVersioningUtils.storageType(httpServletRequest.getRequestURI()),
                 fileName,
-                accountService.getAccountByToken(token)
+                getAccount(token)
         );
         return ResponseEntity.noContent().build();
+    }
+
+    private Account getAccount(String token) {
+        return accountService.getAccountByToken(token)
+                .orElseThrow(() -> new UnauthorizedException("Not found user by auth token"));
     }
 }

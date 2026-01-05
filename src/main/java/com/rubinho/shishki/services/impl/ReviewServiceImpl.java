@@ -1,18 +1,17 @@
 package com.rubinho.shishki.services.impl;
 
 import com.rubinho.shishki.dto.ReviewDto;
+import com.rubinho.shishki.exceptions.ForbiddenException;
 import com.rubinho.shishki.mappers.ReviewMapper;
 import com.rubinho.shishki.model.Account;
-import com.rubinho.shishki.model.Review;
 import com.rubinho.shishki.model.Role;
 import com.rubinho.shishki.repository.ReviewRepository;
 import com.rubinho.shishki.services.ReviewService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ReviewServiceImpl implements ReviewService {
@@ -35,13 +34,8 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public ReviewDto get(Long id) {
-        return reviewMapper.toDto(
-                reviewRepository.findById(id)
-                        .orElseThrow(
-                                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No review by this id")
-                        )
-        );
+    public Optional<ReviewDto> get(Long id) {
+        return reviewRepository.findById(id).map(reviewMapper::toDto);
     }
 
     @Override
@@ -55,17 +49,20 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public ReviewDto edit(Long id, ReviewDto reviewDto, Account account) {
+    public Optional<ReviewDto> edit(Long id, ReviewDto reviewDto, Account account) {
+        if (!reviewRepository.existsById(id)) {
+            return Optional.empty();
+        }
         reviewDto.setId(id);
-        return save(reviewDto, account);
+        return Optional.of(save(reviewDto, account));
     }
 
     @Override
     public void delete(Long id, Account account) {
-        final Review review = reviewRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No review by this id"));
-        check(review.getAccount().getLogin(), account);
-        reviewRepository.delete(review);
+        reviewRepository.findById(id).ifPresent(review ->  {
+            check(review.getAccount().getLogin(), account);
+            reviewRepository.delete(review);
+        });
     }
 
     private void check(String login, Account account) {
@@ -73,7 +70,7 @@ public class ReviewServiceImpl implements ReviewService {
             return;
         }
         if (!account.getLogin().equals(login)){
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not own this review");
+            throw new ForbiddenException("You are not own this review");
         }
     }
 }

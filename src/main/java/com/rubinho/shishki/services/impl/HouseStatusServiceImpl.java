@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class HouseStatusServiceImpl implements HouseStatusService {
@@ -32,12 +33,7 @@ public class HouseStatusServiceImpl implements HouseStatusService {
     }
 
     @Override
-    public HouseStatusDto get(Long id) {
-        return houseStatusMapper.toDto(
-                houseStatusRepository.findById(id)
-                        .orElseThrow(
-                                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No type by this id")
-                        )
-        );
+    public Optional<HouseStatusDto> get(Long id) {
+        return houseStatusRepository.findById(id).map(houseStatusMapper::toDto);
     }
 }

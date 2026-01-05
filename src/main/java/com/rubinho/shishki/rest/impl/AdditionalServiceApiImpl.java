@@ -1,6 +1,8 @@
 package com.rubinho.shishki.rest.impl;
 
 import com.rubinho.shishki.dto.AdditionalServiceDto;
+import com.rubinho.shishki.exceptions.BadRequestException;
+import com.rubinho.shishki.exceptions.NotFoundException;
 import com.rubinho.shishki.rest.AdditionalServiceApi;
 import com.rubinho.shishki.services.AdditionalServiceService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +30,11 @@ public class AdditionalServiceApiImpl implements AdditionalServiceApi {
 
     @Override
     public ResponseEntity<AdditionalServiceDto> get(Long id) {
-        return ResponseEntity.ok(additionalServiceService.get(id));
+        return ResponseEntity.ok(
+                additionalServiceService.get(id).orElseThrow(
+                        () -> new NotFoundException("Service with id %d not found".formatted(id))
+                )
+        );
     }
 
     @Override
@@ -38,22 +44,20 @@ public class AdditionalServiceApiImpl implements AdditionalServiceApi {
                     .status(HttpStatus.CREATED)
                     .body(additionalServiceService.save(additionalServiceDto));
         } catch (DataIntegrityViolationException e) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "Service with name: %s already exists".formatted(additionalServiceDto.getName())
-            );
+            throw new BadRequestException("Service with name: %s already exists".formatted(additionalServiceDto.getName()));
         }
     }
 
     @Override
     public ResponseEntity<AdditionalServiceDto> edit(Long id, AdditionalServiceDto newAdditionalServiceDto) {
+        AdditionalServiceDto serviceDto = additionalServiceService.edit(id, newAdditionalServiceDto)
+                .orElseThrow(() -> new NotFoundException("Service with id %d not found".formatted(id)));
         try {
             return ResponseEntity
                     .status(HttpStatus.ACCEPTED)
-                    .body(additionalServiceService.edit(id, newAdditionalServiceDto));
+                    .body(serviceDto);
         } catch (DataIntegrityViolationException e) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
+            throw new BadRequestException(
                     "Service with name: %s already exists".formatted(newAdditionalServiceDto.getName())
             );
         }

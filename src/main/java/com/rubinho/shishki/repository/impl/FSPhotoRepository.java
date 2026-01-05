@@ -1,11 +1,11 @@
 package com.rubinho.shishki.repository.impl;
 
+import com.rubinho.shishki.exceptions.BadRequestException;
 import com.rubinho.shishki.repository.PhotoRepository;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.server.ServerErrorException;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -37,10 +37,10 @@ public class FSPhotoRepository implements PhotoRepository {
             try {
                 return Files.readAllBytes(imagePath);
             } catch (IOException e) {
-                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Couldn't download file", e);
+                throw new ServerErrorException("Couldn't download file", e);
             }
         } else {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No image with this file name");
+            throw new BadRequestException("No image with this file name");
         }
     }
 
@@ -62,10 +62,7 @@ public class FSPhotoRepository implements PhotoRepository {
         try {
             Files.deleteIfExists(imagePath);
         } catch (IOException e) {
-            throw new ResponseStatusException(
-                    HttpStatus.INTERNAL_SERVER_ERROR,
-                    "Couldn't delete image: %s".formatted(fileName)
-            );
+            throw new ServerErrorException("Couldn't delete image: %s".formatted(fileName), e);
         }
     }
 
@@ -74,7 +71,7 @@ public class FSPhotoRepository implements PhotoRepository {
             final Path filePath = PATH.resolve(fileName);
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Couldn't save file", e);
+            throw new ServerErrorException("Couldn't save file", e);
         }
     }
 }

@@ -2,15 +2,13 @@ package com.rubinho.shishki.services.impl;
 
 import com.rubinho.shishki.dto.AdditionalServiceDto;
 import com.rubinho.shishki.mappers.AdditionalServiceMapper;
-import com.rubinho.shishki.model.AdditionalService;
 import com.rubinho.shishki.repository.AdditionalServiceRepository;
 import com.rubinho.shishki.services.AdditionalServiceService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AdditionalServiceServiceImpl implements AdditionalServiceService {
@@ -33,13 +31,8 @@ public class AdditionalServiceServiceImpl implements AdditionalServiceService {
     }
 
     @Override
-    public AdditionalServiceDto get(Long id) {
-        return additionalServiceMapper.toDto(
-                additionalServiceRepository.findById(id)
-                        .orElseThrow(
-                                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No service by this id")
-                        )
-        );
+    public Optional<AdditionalServiceDto> get(Long id) {
+        return additionalServiceRepository.findById(id).map(additionalServiceMapper::toDto);
     }
 
     @Override
@@ -52,15 +45,16 @@ public class AdditionalServiceServiceImpl implements AdditionalServiceService {
     }
 
     @Override
-    public AdditionalServiceDto edit(Long id, AdditionalServiceDto additionalServiceDto) {
+    public Optional<AdditionalServiceDto> edit(Long id, AdditionalServiceDto additionalServiceDto) {
+        if (!additionalServiceRepository.existsById(id)) {
+            return Optional.empty();
+        }
         additionalServiceDto.setId(id);
-        return save(additionalServiceDto);
+        return Optional.of(save(additionalServiceDto));
     }
 
     @Override
     public void delete(Long id) {
-        final AdditionalService additionalService = additionalServiceRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No service by this id"));
-        additionalServiceRepository.delete(additionalService);
+        additionalServiceRepository.findById(id).ifPresent(additionalServiceRepository::delete);
     }
 }

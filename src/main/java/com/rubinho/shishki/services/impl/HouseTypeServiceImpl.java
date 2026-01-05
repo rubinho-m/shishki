@@ -2,15 +2,13 @@ package com.rubinho.shishki.services.impl;
 
 import com.rubinho.shishki.dto.HouseTypeDto;
 import com.rubinho.shishki.mappers.HouseTypeMapper;
-import com.rubinho.shishki.model.HouseType;
 import com.rubinho.shishki.repository.HouseTypeRepository;
 import com.rubinho.shishki.services.HouseTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class HouseTypeServiceImpl implements HouseTypeService {
@@ -32,13 +30,8 @@ public class HouseTypeServiceImpl implements HouseTypeService {
     }
 
     @Override
-    public HouseTypeDto get(Long id) {
-        return houseTypeMapper.toDto(
-                houseTypeRepository.findById(id)
-                        .orElseThrow(
-                                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No type by this id")
-                        )
-        );
+    public Optional<HouseTypeDto> get(Long id) {
+        return houseTypeRepository.findById(id).map(houseTypeMapper::toDto);
     }
 
     @Override
@@ -51,15 +44,16 @@ public class HouseTypeServiceImpl implements HouseTypeService {
     }
 
     @Override
-    public HouseTypeDto edit(Long id, HouseTypeDto houseDto) {
+    public Optional<HouseTypeDto> edit(Long id, HouseTypeDto houseDto) {
+        if (!houseTypeRepository.existsById(id)) {
+            return Optional.empty();
+        }
         houseDto.setId(id);
-        return save(houseDto);
+        return Optional.of(save(houseDto));
     }
 
     @Override
     public void delete(Long id) {
-        final HouseType houseType = houseTypeRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No type by this id"));
-        houseTypeRepository.delete(houseType);
+        houseTypeRepository.findById(id).ifPresent(houseTypeRepository::delete);
     }
 }

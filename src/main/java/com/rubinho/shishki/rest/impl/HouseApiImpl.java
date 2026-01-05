@@ -1,6 +1,10 @@
 package com.rubinho.shishki.rest.impl;
 
 import com.rubinho.shishki.dto.HouseDto;
+import com.rubinho.shishki.enums.StorageType;
+import com.rubinho.shishki.exceptions.BadRequestException;
+import com.rubinho.shishki.exceptions.NotFoundException;
+import com.rubinho.shishki.exceptions.UnauthorizedException;
 import com.rubinho.shishki.filters.HouseFilter;
 import com.rubinho.shishki.model.Account;
 import com.rubinho.shishki.model.Glamping;
@@ -17,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.FileNotFoundException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
@@ -55,28 +60,37 @@ public class HouseApiImpl implements HouseApi {
 
     @Override
     public ResponseEntity<HouseDto> get(Long id) {
-        return ResponseEntity.ok(houseService.get(id));
+        return ResponseEntity.ok(
+                houseService.get(id)
+                        .orElseThrow(() -> new NotFoundException("House with id %d not found".formatted(id)))
+        );
     }
 
     @Override
     public ResponseEntity<Set<LocalDate>> getBookedDates(Long id) {
-        return ResponseEntity.ok(houseService.getBookedDates(id));
+        return ResponseEntity.ok(
+                houseService.getBookedDates(id)
+                        .orElseThrow(() -> new NotFoundException("House with id %d not found".formatted(id)))
+        );
     }
 
     @Override
     public ResponseEntity<String> getCode(Long id, String token) {
-        final Account account = accountService.getAccountByToken(token);
-        return ResponseEntity.ok(houseService.getCode(id, account));
+        final Account account = getAccount(token);
+        return ResponseEntity.ok(
+                houseService.getCode(id, account)
+                        .orElseThrow(() -> new NotFoundException("House with id %d not found".formatted(id)))
+        );
     }
 
     @Override
     public ResponseEntity<HouseDto> add(HttpServletRequest httpServletRequest,
                                         HouseDto houseDto,
                                         String token) {
-        final Account account = accountService.getAccountByToken(token);
-        photoService.checkIfExists(
-                apiVersioningUtils.storageType(httpServletRequest.getRequestURI()),
-                houseDto.getPhotoName()
+        final Account account = getAccount(token);
+        checkPhotoExists(
+                houseDto.getPhotoName(),
+                apiVersioningUtils.storageType(httpServletRequest.getRequestURI())
         );
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -88,20 +102,35 @@ public class HouseApiImpl implements HouseApi {
                                          Long id,
                                          HouseDto newHouseDto,
                                          String token) {
-        final Account account = accountService.getAccountByToken(token);
-        photoService.checkIfExists(
-                apiVersioningUtils.storageType(httpServletRequest.getRequestURI()),
-                newHouseDto.getPhotoName()
+        final Account account = getAccount(token);
+        checkPhotoExists(
+                newHouseDto.getPhotoName(),
+                apiVersioningUtils.storageType(httpServletRequest.getRequestURI())
         );
+        final HouseDto house = houseService.edit(id, newHouseDto, account)
+                .orElseThrow(() -> new NotFoundException("House with id %d not found".formatted(id)));
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
-                .body(houseService.edit(id, newHouseDto, account));
+                .body(house);
     }
 
     @Override
     public ResponseEntity<Void> delete(Long id, String token) {
-        final Account account = accountService.getAccountByToken(token);
+        final Account account = getAccount(token);
         houseService.delete(id, account);
         return ResponseEntity.noContent().build();
+    }
+
+    private void checkPhotoExists(String photoName, StorageType storageType) {
+        try {
+            photoService.checkIfExists(storageType, photoName);
+        } catch (FileNotFoundException e) {
+            throw new BadRequestException(e.getMessage());
+        }
+    }
+
+    private Account getAccount(String token) {
+        return accountService.getAccountByToken(token)
+                .orElseThrow(() -> new UnauthorizedException("Not found user by auth token"));
     }
 }

@@ -1,6 +1,8 @@
 package com.rubinho.shishki.rest.impl;
 
 import com.rubinho.shishki.dto.ReviewDto;
+import com.rubinho.shishki.exceptions.NotFoundException;
+import com.rubinho.shishki.exceptions.UnauthorizedException;
 import com.rubinho.shishki.model.Account;
 import com.rubinho.shishki.rest.ReviewApi;
 import com.rubinho.shishki.services.AccountService;
@@ -30,12 +32,15 @@ public class ReviewApiImpl implements ReviewApi {
 
     @Override
     public ResponseEntity<ReviewDto> get(Long id) {
-        return ResponseEntity.ok(reviewService.get(id));
+        return ResponseEntity.ok(
+                reviewService.get(id)
+                        .orElseThrow(() -> new NotFoundException("Review with id %d not found".formatted(id)))
+        );
     }
 
     @Override
     public ResponseEntity<ReviewDto> add(ReviewDto reviewDto, String token) {
-        final Account account = accountService.getAccountByToken(token);
+        final Account account = getAccount(token);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(reviewService.save(reviewDto, account));
@@ -43,16 +48,23 @@ public class ReviewApiImpl implements ReviewApi {
 
     @Override
     public ResponseEntity<ReviewDto> edit(Long id, ReviewDto newReviewDto, String token) {
-        final Account account = accountService.getAccountByToken(token);
+        final Account account = getAccount(token);
+        final ReviewDto reviewDto = reviewService.edit(id, newReviewDto, account)
+                .orElseThrow(() -> new NotFoundException("Review with id %d not found".formatted(id)));
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
-                .body(reviewService.edit(id, newReviewDto, account));
+                .body(reviewDto);
     }
 
     @Override
     public ResponseEntity<Void> delete(Long id, String token) {
-        final Account account = accountService.getAccountByToken(token);
+        final Account account = getAccount(token);
         reviewService.delete(id, account);
         return ResponseEntity.noContent().build();
+    }
+
+    private Account getAccount(String token) {
+        return accountService.getAccountByToken(token)
+                .orElseThrow(() -> new UnauthorizedException("Not found user by auth token"));
     }
 }

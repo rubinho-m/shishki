@@ -1,6 +1,7 @@
 package com.rubinho.shishki.services.impl;
 
 import com.rubinho.shishki.dto.HouseDto;
+import com.rubinho.shishki.exceptions.ForbiddenException;
 import com.rubinho.shishki.filters.HouseFilter;
 import com.rubinho.shishki.mappers.HouseMapper;
 import com.rubinho.shishki.model.Account;
@@ -12,13 +13,12 @@ import com.rubinho.shishki.services.HouseService;
 import com.rubinho.shishki.services.HouseSpecificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.Spliterator;
 import java.util.Spliterators;
@@ -50,52 +50,35 @@ public class HouseServiceImpl implements HouseService {
     }
 
     @Override
-    public HouseDto get(Long id) {
-        return houseMapper.toDto(
-                houseRepository.findById(id)
-                        .orElseThrow(
-                                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No house by this id")
-                        )
-        );
+    public Optional<HouseDto> get(Long id) {
+        return houseRepository.findById(id).map(houseMapper::toDto);
     }
 
     @Override
-    public Set<LocalDate> getBookedDates(Long id) {
-        final House house = houseRepository.findById(id)
-                .orElseThrow(
-                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No house by this id")
-                );
-        return house.getBookings().stream()
-                .flatMap(booking -> StreamSupport.stream(
-                        Spliterators.spliteratorUnknownSize(
-                                new DateRangeIterator(booking.getDateStart(), booking.getDateEnd()),
-                                Spliterator.ORDERED
-                        ), false
-                ))
-                .collect(Collectors.toSet());
+    public Optional<Set<LocalDate>> getBookedDates(Long id) {
+        return houseRepository.findById(id)
+                .map(house -> house.getBookings().stream()
+                        .flatMap(booking -> StreamSupport.stream(
+                                Spliterators.spliteratorUnknownSize(
+                                        new DateRangeIterator(booking.getDateStart(), booking.getDateEnd()),
+                                        Spliterator.ORDERED
+                                ), false
+                        ))
+                        .collect(Collectors.toSet()));
     }
 
     @Override
-    public String getCode(Long id, Account account) {
+    public Optional<String> getCode(Long id, Account account) {
         return switch (account.getRole()) {
-            case USER, POTENTIAL_OWNER -> throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to access this resource");
-            case ADMIN, STAFF -> {
-                final House house = houseRepository.findById(id)
-                        .orElseThrow(
-                                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No house by this id")
-                        );
-                yield getActualCode(house);
-            }
-            case OWNER -> {
-                final House house = houseRepository.findById(id)
-                        .orElseThrow(
-                                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No house by this id")
-                        );
-                if (!house.getGlamping().getOwner().equals(account)){
-                    throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to access this resource");
-                }
-                yield getActualCode(house);
-            }
+            case USER, POTENTIAL_OWNER -> throw new ForbiddenException("You are not allowed to access this resource");
+            case ADMIN, STAFF -> houseRepository.findById(id).map(this::getActualCode);
+            case OWNER -> houseRepository.findById(id)
+                    .map(house -> {
+                        if (!house.getGlamping().getOwner().equals(account)) {
+                            throw new ForbiddenException("You are not allowed to access this resource");
+                        }
+                        return getActualCode(house);
+                    });
         };
     }
 
@@ -103,25 +86,26 @@ public class HouseServiceImpl implements HouseService {
     public HouseDto save(HouseDto houseDto, Account account) {
         final House house = houseMapper.toEntity(houseDto);
         check(house, account);
-        return houseMapper.toDto(
-                houseRepository.save(
-                        house
-                )
-        );
+        return houseMapper.toDto(houseRepository.save(house));
     }
 
     @Override
-    public HouseDto edit(Long id, HouseDto houseDto, Account account) {
+    public Optional<HouseDto> edit(Long id, HouseDto houseDto, Account account) {
+        if (!houseRepository.existsById(id)) {
+            return Optional.empty();
+        }
         houseDto.setId(id);
-        return save(houseDto, account);
+        return Optional.of(save(houseDto, account));
     }
 
     @Override
     public void delete(Long id, Account account) {
-        final House house = houseRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No house by this id"));
-        check(house, account);
-        houseRepository.delete(house);
+        houseRepository.findById(id).ifPresent(
+                house -> {
+                    check(house, account);
+                    houseRepository.delete(house);
+                }
+        );
     }
 
     private static class DateRangeIterator implements Iterator<LocalDate> {
@@ -151,7 +135,7 @@ public class HouseServiceImpl implements HouseService {
             return;
         }
         if (!house.getGlamping().getOwner().equals(account)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You have not permission to operate this glamping");
+            throw new ForbiddenException("You have not permission to operate this glamping");
         }
     }
 

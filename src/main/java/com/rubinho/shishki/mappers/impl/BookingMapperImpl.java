@@ -5,6 +5,7 @@ import com.rubinho.shishki.dto.BookingRequestDto;
 import com.rubinho.shishki.dto.BookingResponseDto;
 import com.rubinho.shishki.dto.GuestDto;
 import com.rubinho.shishki.dto.ShopItemDto;
+import com.rubinho.shishki.exceptions.NotFoundException;
 import com.rubinho.shishki.mappers.AdditionalServiceMapper;
 import com.rubinho.shishki.mappers.BookingMapper;
 import com.rubinho.shishki.mappers.GuestMapper;
@@ -22,9 +23,7 @@ import com.rubinho.shishki.repository.GuestRepository;
 import com.rubinho.shishki.repository.HouseRepository;
 import com.rubinho.shishki.repository.ShopItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Set;
@@ -67,13 +66,11 @@ public class BookingMapperImpl implements BookingMapper {
     public Booking toEntity(BookingRequestDto bookingRequestDto) {
         final Account user = accountRepository.findByLogin(bookingRequestDto.getLogin())
                 .orElseThrow(
-                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found account with login: %s"
-                                .formatted(bookingRequestDto.getLogin()))
+                        () -> new NotFoundException("Not found account with login: %s".formatted(bookingRequestDto.getLogin()))
                 );
         final House house = houseRepository.findById(bookingRequestDto.getHouseId())
                 .orElseThrow(
-                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found house with id: %d"
-                                .formatted(bookingRequestDto.getHouseId()))
+                        () -> new NotFoundException("Not found house with id: %d".formatted(bookingRequestDto.getHouseId()))
                 );
 
         final Set<ShopItem> shopItems = shopItemRepository
