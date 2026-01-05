@@ -1,5 +1,6 @@
 package com.rubinho.shishki.rest;
 
+import com.rubinho.shishki.config.AdminAuthorization;
 import com.rubinho.shishki.dto.GlampingResponseDto;
 import com.rubinho.shishki.dto.PotentialOwnerDto;
 import com.rubinho.shishki.dto.SecuredAccountDto;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import java.util.List;
 
 @ApiVersioned(path = {"/api/v2"})
+@AdminAuthorization
 public interface AdminApi {
     @GetMapping("/admin/owners")
     ResponseEntity<List<PotentialOwnerDto>> getAllPotentialOwners();

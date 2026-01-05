@@ -1,5 +1,8 @@
 package com.rubinho.shishki.rest;
 
+import com.rubinho.shishki.config.AdminAuthorization;
+import com.rubinho.shishki.config.NoAuth;
+import com.rubinho.shishki.config.OwnerAuthorization;
 import com.rubinho.shishki.dto.PhotoDto;
 import com.rubinho.shishki.rest.versions.ApiVersioned;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,21 +20,25 @@ import org.springframework.web.multipart.MultipartFile;
 @ApiVersioned(path = {"/api/v1", "/api/v2"})
 public interface PhotoApi {
     @GetMapping("/photo/{fileName}")
+    @NoAuth
     ResponseEntity<Resource> get(HttpServletRequest httpServletRequest,
                                  @PathVariable String fileName);
 
     @PostMapping("/photo")
+    @OwnerAuthorization
     ResponseEntity<PhotoDto> add(HttpServletRequest httpServletRequest,
                                  @RequestParam("file") MultipartFile file,
                                  @RequestHeader("Authorization") String token);
 
     @PutMapping("/photo/{fileName}")
+    @OwnerAuthorization
     ResponseEntity<PhotoDto> edit(HttpServletRequest httpServletRequest,
                                   @PathVariable String fileName,
                                   @RequestParam("file") MultipartFile file,
                                   @RequestHeader("Authorization") String token);
 
     @DeleteMapping("/photo/{fileName}")
+    @AdminAuthorization
     ResponseEntity<Void> delete(HttpServletRequest httpServletRequest,
                                 @PathVariable String fileName,
                                 @RequestHeader("Authorization") String token);
