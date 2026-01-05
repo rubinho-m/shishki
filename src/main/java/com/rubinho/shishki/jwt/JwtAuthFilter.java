@@ -16,13 +16,17 @@ import java.io.IOException;
 
 public class JwtAuthFilter extends OncePerRequestFilter {
     private final UserAuthProvider userAuthProvider;
+    private final JwtUtils jwtUtils;
 
     @Qualifier("handlerExceptionResolver")
     private final HandlerExceptionResolver resolver;
 
-    public JwtAuthFilter(UserAuthProvider userAuthProvider, HandlerExceptionResolver resolver) {
+    public JwtAuthFilter(UserAuthProvider userAuthProvider,
+                         HandlerExceptionResolver resolver,
+                         JwtUtils jwtUtils) {
         this.userAuthProvider = userAuthProvider;
         this.resolver = resolver;
+        this.jwtUtils = jwtUtils;
     }
 
     @Override
@@ -32,7 +36,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String bearerToken = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (bearerToken != null) {
             if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
-                String token = bearerToken.split(" ")[1];
+                String token = jwtUtils.escapeToken(bearerToken);
                 try {
                     SecurityContextHolder.getContext().setAuthentication(
                             userAuthProvider.validateToken(token)

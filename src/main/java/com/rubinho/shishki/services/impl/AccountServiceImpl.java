@@ -5,6 +5,7 @@ import com.rubinho.shishki.dto.RegisterDto;
 import com.rubinho.shishki.dto.RegisteredUserDto;
 import com.rubinho.shishki.exceptions.rest.ForbiddenException;
 import com.rubinho.shishki.exceptions.rest.UnauthorizedException;
+import com.rubinho.shishki.jwt.JwtUtils;
 import com.rubinho.shishki.jwt.UserAuthProvider;
 import com.rubinho.shishki.mappers.AccountMapper;
 import com.rubinho.shishki.model.Account;
@@ -27,6 +28,7 @@ public class AccountServiceImpl implements AccountService {
     private final AccountRepository accountRepository;
     private final AccountMapper accountMapper;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtils jwtUtils;
 
     private final Set<Role> ALLOWED_REGISTERING_ROLES = Set.of(Role.USER, Role.OWNER);
 
@@ -35,12 +37,14 @@ public class AccountServiceImpl implements AccountService {
                               AccountRepository accountRepository,
                               GuestRepository guestRepository,
                               AccountMapper accountMapper,
-                              PasswordEncoder passwordEncoder) {
+                              PasswordEncoder passwordEncoder,
+                              JwtUtils jwtUtils) {
         this.userAuthProvider = userAuthProvider;
         this.accountRepository = accountRepository;
         this.guestRepository = guestRepository;
         this.accountMapper = accountMapper;
         this.passwordEncoder = passwordEncoder;
+        this.jwtUtils = jwtUtils;
     }
 
     @Override
@@ -72,7 +76,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Optional<Account> getAccountByToken(String token) {
-        final String login = userAuthProvider.getLoginFromJwt(token.split(" ")[1]);
+        final String login = userAuthProvider.getLoginFromJwt(jwtUtils.escapeToken(token));
         return accountRepository.findByLogin(login);
     }
 

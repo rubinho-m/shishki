@@ -3,6 +3,7 @@ package com.rubinho.shishki.config;
 import com.rubinho.shishki.jwt.JwtAccessDeniedHandler;
 import com.rubinho.shishki.jwt.JwtAuthFilter;
 import com.rubinho.shishki.jwt.JwtAuthenticationEntryPoint;
+import com.rubinho.shishki.jwt.JwtUtils;
 import com.rubinho.shishki.jwt.UserAuthProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -31,6 +32,7 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 public class SecurityConfiguration {
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final UserAuthProvider userAuthProvider;
+    private final JwtUtils jwtUtils;
 
     @Qualifier("handlerExceptionResolver")
     private final HandlerExceptionResolver resolver;
@@ -38,10 +40,12 @@ public class SecurityConfiguration {
     @Autowired
     public SecurityConfiguration(JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
                                  UserAuthProvider userAuthProvider,
-                                 @Qualifier("handlerExceptionResolver") HandlerExceptionResolver resolver) {
+                                 @Qualifier("handlerExceptionResolver") HandlerExceptionResolver resolver,
+                                 JwtUtils jwtUtils) {
         this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
         this.userAuthProvider = userAuthProvider;
         this.resolver = resolver;
+        this.jwtUtils = jwtUtils;
     }
 
     @Bean
@@ -58,7 +62,7 @@ public class SecurityConfiguration {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
-                .addFilterBefore(new JwtAuthFilter(userAuthProvider, resolver), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtAuthFilter(userAuthProvider, resolver, jwtUtils), UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling((exception) -> exception.authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 .exceptionHandling(exception -> exception.accessDeniedHandler(accessDeniedHandler()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
