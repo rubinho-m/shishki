@@ -2,6 +2,7 @@ package com.rubinho.shishki.rest.impl;
 
 import com.rubinho.shishki.dto.GlampingRequestDto;
 import com.rubinho.shishki.dto.GlampingResponseDto;
+import com.rubinho.shishki.exceptions.AccountNotFoundException;
 import com.rubinho.shishki.exceptions.rest.BadRequestException;
 import com.rubinho.shishki.exceptions.rest.NotFoundException;
 import com.rubinho.shishki.exceptions.rest.UnauthorizedException;
@@ -66,13 +67,14 @@ public class GlampingApiImpl implements GlampingApi {
                     apiVersioningUtils.storageType(httpServletRequest.getRequestURI()),
                     glampingRequestDto.getPhotoName()
             );
-        }
-        catch (FileNotFoundException e) {
+            return ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .body(glampingService.save(glampingRequestDto, account));
+        } catch (FileNotFoundException e) {
             throw new BadRequestException(e.getMessage());
+        } catch (AccountNotFoundException e) {
+            throw new NotFoundException(e.getMessage());
         }
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(glampingService.save(glampingRequestDto, account));
     }
 
     @Override
@@ -86,14 +88,16 @@ public class GlampingApiImpl implements GlampingApi {
                     apiVersioningUtils.storageType(httpServletRequest.getRequestURI()),
                     newGlampingRequestDto.getPhotoName()
             );
+            final GlampingResponseDto glamping = glampingService.edit(id, newGlampingRequestDto, account)
+                    .orElseThrow(() -> new NotFoundException("Glamping with id %d not found".formatted(id)));
+            return ResponseEntity
+                    .status(HttpStatus.ACCEPTED)
+                    .body(glamping);
         } catch (FileNotFoundException e) {
             throw new BadRequestException(e.getMessage());
+        } catch (AccountNotFoundException e) {
+            throw new NotFoundException(e.getMessage());
         }
-        final GlampingResponseDto glamping = glampingService.edit(id, newGlampingRequestDto, account)
-                .orElseThrow(() -> new NotFoundException("Glamping with id %d not found".formatted(id)));
-        return ResponseEntity
-                .status(HttpStatus.ACCEPTED)
-                .body(glamping);
     }
 
     @Override

@@ -1,6 +1,9 @@
 package com.rubinho.shishki.services.impl;
 
 import com.rubinho.shishki.dto.HouseDto;
+import com.rubinho.shishki.exceptions.GlampingNotFoundException;
+import com.rubinho.shishki.exceptions.HouseStatusNotFoundException;
+import com.rubinho.shishki.exceptions.HouseTypeNotFoundException;
 import com.rubinho.shishki.exceptions.rest.ForbiddenException;
 import com.rubinho.shishki.filters.HouseFilter;
 import com.rubinho.shishki.mappers.HouseMapper;
@@ -83,14 +86,14 @@ public class HouseServiceImpl implements HouseService {
     }
 
     @Override
-    public HouseDto save(HouseDto houseDto, Account account) {
+    public HouseDto save(HouseDto houseDto, Account account) throws HouseTypeNotFoundException, HouseStatusNotFoundException, GlampingNotFoundException {
         final House house = houseMapper.toEntity(houseDto);
         check(house, account);
         return houseMapper.toDto(houseRepository.save(house));
     }
 
     @Override
-    public Optional<HouseDto> edit(Long id, HouseDto houseDto, Account account) {
+    public Optional<HouseDto> edit(Long id, HouseDto houseDto, Account account) throws HouseTypeNotFoundException, HouseStatusNotFoundException, GlampingNotFoundException {
         if (!houseRepository.existsById(id)) {
             return Optional.empty();
         }

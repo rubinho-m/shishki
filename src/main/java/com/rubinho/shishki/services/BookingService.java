@@ -2,6 +2,8 @@ package com.rubinho.shishki.services;
 
 import com.rubinho.shishki.dto.BookingRequestDto;
 import com.rubinho.shishki.dto.BookingResponseDto;
+import com.rubinho.shishki.exceptions.AccountNotFoundException;
+import com.rubinho.shishki.exceptions.HouseNotFoundException;
 import com.rubinho.shishki.exceptions.rest.BookingValidationException;
 import com.rubinho.shishki.model.Account;
 
@@ -17,9 +19,9 @@ public interface BookingService {
 
     Optional<BookingResponseDto> get(Long id);
 
-    BookingResponseDto save(BookingRequestDto bookingRequestDto, Account account) throws BookingValidationException;
+    BookingResponseDto save(BookingRequestDto bookingRequestDto, Account account) throws BookingValidationException, HouseNotFoundException, AccountNotFoundException;
 
-    Optional<BookingResponseDto> edit(Long id, BookingRequestDto bookingRequestDto, Account account) throws BookingValidationException;
+    Optional<BookingResponseDto> edit(Long id, BookingRequestDto bookingRequestDto, Account account) throws BookingValidationException, HouseNotFoundException, AccountNotFoundException;
 
     void delete(Long id, Account account);
 }

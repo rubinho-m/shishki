@@ -1,6 +1,9 @@
 package com.rubinho.shishki.services;
 
 import com.rubinho.shishki.dto.HouseDto;
+import com.rubinho.shishki.exceptions.GlampingNotFoundException;
+import com.rubinho.shishki.exceptions.HouseStatusNotFoundException;
+import com.rubinho.shishki.exceptions.HouseTypeNotFoundException;
 import com.rubinho.shishki.filters.HouseFilter;
 import com.rubinho.shishki.model.Account;
 
@@ -18,9 +21,9 @@ public interface HouseService {
 
     Optional<String> getCode(Long id, Account account);
 
-    HouseDto save(HouseDto houseDto, Account account);
+    HouseDto save(HouseDto houseDto, Account account) throws HouseTypeNotFoundException, HouseStatusNotFoundException, GlampingNotFoundException;
 
-    Optional<HouseDto> edit(Long id, HouseDto houseDto, Account account);
+    Optional<HouseDto> edit(Long id, HouseDto houseDto, Account account) throws HouseTypeNotFoundException, HouseStatusNotFoundException, GlampingNotFoundException;
 
     void delete(Long id, Account account);
 }

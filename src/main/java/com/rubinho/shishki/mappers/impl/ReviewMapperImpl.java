@@ -1,7 +1,8 @@
 package com.rubinho.shishki.mappers.impl;
 
 import com.rubinho.shishki.dto.ReviewDto;
-import com.rubinho.shishki.exceptions.rest.NotFoundException;
+import com.rubinho.shishki.exceptions.AccountNotFoundException;
+import com.rubinho.shishki.exceptions.GlampingNotFoundException;
 import com.rubinho.shishki.mappers.ReviewMapper;
 import com.rubinho.shishki.model.Account;
 import com.rubinho.shishki.model.Glamping;
@@ -24,16 +25,11 @@ public class ReviewMapperImpl implements ReviewMapper {
     }
 
     @Override
-    public Review toEntity(ReviewDto reviewDto) {
+    public Review toEntity(ReviewDto reviewDto) throws AccountNotFoundException, GlampingNotFoundException {
         final Glamping glamping = glampingRepository.findById(reviewDto.getGlampingId())
-                .orElseThrow(
-                        () -> new NotFoundException("Glamping not found by id: %d".formatted(reviewDto.getGlampingId()))
-                );
+                .orElseThrow(() -> new GlampingNotFoundException(reviewDto.getGlampingId()));
         final Account account = accountRepository.findByLogin(reviewDto.getLogin())
-                .orElseThrow(
-                        () -> new NotFoundException("Account not found by login: %s".formatted(reviewDto.getLogin()))
-                );
-
+                .orElseThrow(() -> new AccountNotFoundException(reviewDto.getLogin()));
         return Review.builder()
                 .id(reviewDto.getId())
                 .glamping(glamping)

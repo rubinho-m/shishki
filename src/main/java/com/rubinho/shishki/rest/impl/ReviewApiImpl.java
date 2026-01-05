@@ -1,6 +1,8 @@
 package com.rubinho.shishki.rest.impl;
 
 import com.rubinho.shishki.dto.ReviewDto;
+import com.rubinho.shishki.exceptions.AccountNotFoundException;
+import com.rubinho.shishki.exceptions.GlampingNotFoundException;
 import com.rubinho.shishki.exceptions.rest.NotFoundException;
 import com.rubinho.shishki.exceptions.rest.UnauthorizedException;
 import com.rubinho.shishki.model.Account;
@@ -41,19 +43,27 @@ public class ReviewApiImpl implements ReviewApi {
     @Override
     public ResponseEntity<ReviewDto> add(ReviewDto reviewDto, String token) {
         final Account account = getAccount(token);
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(reviewService.save(reviewDto, account));
+        try {
+            return ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .body(reviewService.save(reviewDto, account));
+        } catch (GlampingNotFoundException | AccountNotFoundException e) {
+            throw new NotFoundException(e.getMessage());
+        }
     }
 
     @Override
     public ResponseEntity<ReviewDto> edit(Long id, ReviewDto newReviewDto, String token) {
         final Account account = getAccount(token);
-        final ReviewDto reviewDto = reviewService.edit(id, newReviewDto, account)
-                .orElseThrow(() -> new NotFoundException("Review with id %d not found".formatted(id)));
-        return ResponseEntity
-                .status(HttpStatus.ACCEPTED)
-                .body(reviewDto);
+        try {
+            final ReviewDto reviewDto = reviewService.edit(id, newReviewDto, account)
+                    .orElseThrow(() -> new NotFoundException("Review with id %d not found".formatted(id)));
+            return ResponseEntity
+                    .status(HttpStatus.ACCEPTED)
+                    .body(reviewDto);
+        } catch (GlampingNotFoundException | AccountNotFoundException e) {
+            throw new NotFoundException(e.getMessage());
+        }
     }
 
     @Override

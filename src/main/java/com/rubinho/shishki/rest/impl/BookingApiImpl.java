@@ -2,6 +2,8 @@ package com.rubinho.shishki.rest.impl;
 
 import com.rubinho.shishki.dto.BookingRequestDto;
 import com.rubinho.shishki.dto.BookingResponseDto;
+import com.rubinho.shishki.exceptions.AccountNotFoundException;
+import com.rubinho.shishki.exceptions.HouseNotFoundException;
 import com.rubinho.shishki.exceptions.rest.BadRequestException;
 import com.rubinho.shishki.exceptions.rest.BookingValidationException;
 import com.rubinho.shishki.exceptions.rest.NotFoundException;
@@ -72,6 +74,8 @@ public class BookingApiImpl implements BookingApi {
                     .body(bookingService.save(bookingRequestDto, account));
         } catch (BookingValidationException e) {
             throw new BadRequestException(e.getMessage());
+        } catch (HouseNotFoundException | AccountNotFoundException e) {
+            throw new NotFoundException(e.getMessage());
         }
     }
 
@@ -88,6 +92,8 @@ public class BookingApiImpl implements BookingApi {
                     .body(booking);
         } catch (BookingValidationException e) {
             throw new BadRequestException(e.getMessage());
+        } catch (HouseNotFoundException | AccountNotFoundException e) {
+            throw new NotFoundException(e.getMessage());
         }
     }
 

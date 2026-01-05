@@ -1,7 +1,9 @@
 package com.rubinho.shishki.mappers.impl;
 
 import com.rubinho.shishki.dto.HouseDto;
-import com.rubinho.shishki.exceptions.rest.NotFoundException;
+import com.rubinho.shishki.exceptions.GlampingNotFoundException;
+import com.rubinho.shishki.exceptions.HouseStatusNotFoundException;
+import com.rubinho.shishki.exceptions.HouseTypeNotFoundException;
 import com.rubinho.shishki.mappers.HouseMapper;
 import com.rubinho.shishki.model.Glamping;
 import com.rubinho.shishki.model.House;
@@ -29,18 +31,18 @@ public class HouseMapperImpl implements HouseMapper {
     }
 
     @Override
-    public House toEntity(HouseDto houseDto) {
+    public House toEntity(HouseDto houseDto) throws GlampingNotFoundException, HouseTypeNotFoundException, HouseStatusNotFoundException {
         final HouseType houseType = houseTypeRepository.findByType(houseDto.getHouseType())
                 .orElseThrow(
-                        () -> new NotFoundException("Not found house type: %s".formatted(houseDto.getHouseType()))
+                        () -> new HouseTypeNotFoundException(houseDto.getHouseType())
                 );
         final HouseStatus houseStatus = houseStatusRepository.findByStatus(houseDto.getHouseStatus())
                 .orElseThrow(
-                        () -> new NotFoundException("Not found house status: %s".formatted(houseDto.getHouseStatus()))
+                        () -> new HouseStatusNotFoundException(houseDto.getHouseStatus())
                 );
         final Glamping glamping = glampingRepository.findById(houseDto.getGlampingId())
                 .orElseThrow(
-                        () -> new NotFoundException("Not found glamping by id: %d".formatted(houseDto.getGlampingId()))
+                        () -> new GlampingNotFoundException(houseDto.getGlampingId())
                 );
         return House.builder()
                 .id(houseDto.getId())

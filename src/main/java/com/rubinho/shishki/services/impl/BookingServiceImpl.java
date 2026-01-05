@@ -2,6 +2,8 @@ package com.rubinho.shishki.services.impl;
 
 import com.rubinho.shishki.dto.BookingRequestDto;
 import com.rubinho.shishki.dto.BookingResponseDto;
+import com.rubinho.shishki.exceptions.AccountNotFoundException;
+import com.rubinho.shishki.exceptions.HouseNotFoundException;
 import com.rubinho.shishki.exceptions.rest.BookingValidationException;
 import com.rubinho.shishki.exceptions.rest.ForbiddenException;
 import com.rubinho.shishki.mappers.BookingMapper;
@@ -76,7 +78,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public BookingResponseDto save(BookingRequestDto bookingRequestDto, Account account) throws BookingValidationException {
+    public BookingResponseDto save(BookingRequestDto bookingRequestDto, Account account) throws BookingValidationException, HouseNotFoundException, AccountNotFoundException {
         final Booking booking = bookingMapper.toEntity(bookingRequestDto);
         check(booking, account);
         checkHouse(booking);
@@ -87,7 +89,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public Optional<BookingResponseDto> edit(Long id, BookingRequestDto bookingRequestDto, Account account) throws BookingValidationException {
+    public Optional<BookingResponseDto> edit(Long id, BookingRequestDto bookingRequestDto, Account account) throws BookingValidationException, HouseNotFoundException, AccountNotFoundException {
         if (!bookingRepository.existsById(id)) {
             return Optional.empty();
         }

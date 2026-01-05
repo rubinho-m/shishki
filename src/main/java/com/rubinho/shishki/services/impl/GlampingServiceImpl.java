@@ -2,6 +2,7 @@ package com.rubinho.shishki.services.impl;
 
 import com.rubinho.shishki.dto.GlampingRequestDto;
 import com.rubinho.shishki.dto.GlampingResponseDto;
+import com.rubinho.shishki.exceptions.AccountNotFoundException;
 import com.rubinho.shishki.exceptions.rest.ForbiddenException;
 import com.rubinho.shishki.mappers.GlampingMapper;
 import com.rubinho.shishki.model.Account;
@@ -50,7 +51,7 @@ public class GlampingServiceImpl implements GlampingService {
     }
 
     @Override
-    public GlampingResponseDto save(GlampingRequestDto glampingRequestDto, Account account) {
+    public GlampingResponseDto save(GlampingRequestDto glampingRequestDto, Account account) throws AccountNotFoundException {
         final Glamping glamping = glampingMapper.toEntity(glampingRequestDto);
         glamping.setGlampingStatus(GlampingStatus.WAITING_FOR_CONFIRMATION);
         check(glamping, account);
@@ -60,7 +61,7 @@ public class GlampingServiceImpl implements GlampingService {
     }
 
     @Override
-    public Optional<GlampingResponseDto> edit(Long id, GlampingRequestDto glampingRequestDto, Account account) {
+    public Optional<GlampingResponseDto> edit(Long id, GlampingRequestDto glampingRequestDto, Account account) throws AccountNotFoundException {
         if (!glampingRepository.existsById(id)) {
             return Optional.empty();
         }

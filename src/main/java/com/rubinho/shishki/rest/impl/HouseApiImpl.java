@@ -2,6 +2,9 @@ package com.rubinho.shishki.rest.impl;
 
 import com.rubinho.shishki.dto.HouseDto;
 import com.rubinho.shishki.enums.StorageType;
+import com.rubinho.shishki.exceptions.GlampingNotFoundException;
+import com.rubinho.shishki.exceptions.HouseStatusNotFoundException;
+import com.rubinho.shishki.exceptions.HouseTypeNotFoundException;
 import com.rubinho.shishki.exceptions.rest.BadRequestException;
 import com.rubinho.shishki.exceptions.rest.NotFoundException;
 import com.rubinho.shishki.exceptions.rest.UnauthorizedException;
@@ -92,9 +95,13 @@ public class HouseApiImpl implements HouseApi {
                 houseDto.getPhotoName(),
                 apiVersioningUtils.storageType(httpServletRequest.getRequestURI())
         );
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(houseService.save(houseDto, account));
+        try {
+            return ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .body(houseService.save(houseDto, account));
+        } catch (HouseTypeNotFoundException | HouseStatusNotFoundException | GlampingNotFoundException e) {
+            throw new NotFoundException(e.getMessage());
+        }
     }
 
     @Override
@@ -107,11 +114,15 @@ public class HouseApiImpl implements HouseApi {
                 newHouseDto.getPhotoName(),
                 apiVersioningUtils.storageType(httpServletRequest.getRequestURI())
         );
-        final HouseDto house = houseService.edit(id, newHouseDto, account)
-                .orElseThrow(() -> new NotFoundException("House with id %d not found".formatted(id)));
-        return ResponseEntity
-                .status(HttpStatus.ACCEPTED)
-                .body(house);
+        try {
+            final HouseDto house = houseService.edit(id, newHouseDto, account)
+                    .orElseThrow(() -> new NotFoundException("House with id %d not found".formatted(id)));
+            return ResponseEntity
+                    .status(HttpStatus.ACCEPTED)
+                    .body(house);
+        }  catch (HouseTypeNotFoundException | HouseStatusNotFoundException | GlampingNotFoundException e) {
+            throw new NotFoundException(e.getMessage());
+        }
     }
 
     @Override

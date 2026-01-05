@@ -1,6 +1,8 @@
 package com.rubinho.shishki.services.impl;
 
 import com.rubinho.shishki.dto.ReviewDto;
+import com.rubinho.shishki.exceptions.AccountNotFoundException;
+import com.rubinho.shishki.exceptions.GlampingNotFoundException;
 import com.rubinho.shishki.exceptions.rest.ForbiddenException;
 import com.rubinho.shishki.mappers.ReviewMapper;
 import com.rubinho.shishki.model.Account;
@@ -39,7 +41,7 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public ReviewDto save(ReviewDto reviewDto, Account account) {
+    public ReviewDto save(ReviewDto reviewDto, Account account) throws GlampingNotFoundException, AccountNotFoundException {
         check(reviewDto.getLogin(), account);
         return reviewMapper.toDto(
                 reviewRepository.save(
@@ -49,7 +51,7 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public Optional<ReviewDto> edit(Long id, ReviewDto reviewDto, Account account) {
+    public Optional<ReviewDto> edit(Long id, ReviewDto reviewDto, Account account) throws GlampingNotFoundException, AccountNotFoundException {
         if (!reviewRepository.existsById(id)) {
             return Optional.empty();
         }
