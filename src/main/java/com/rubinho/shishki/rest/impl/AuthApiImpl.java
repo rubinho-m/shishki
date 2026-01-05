@@ -21,7 +21,7 @@ public class AuthApiImpl implements AuthApi {
 
     @Override
     public ResponseEntity<RegisteredUserDto> register(RegisterDto registerDto) {
-        return ResponseEntity.ok(accountService.register(registerDto));
+        return ResponseEntity.ok(accountService.register(registerDto, false));
     }
 
     @Override

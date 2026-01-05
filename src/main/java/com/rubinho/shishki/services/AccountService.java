@@ -8,7 +8,7 @@ import com.rubinho.shishki.model.Account;
 import java.util.Optional;
 
 public interface AccountService {
-    RegisteredUserDto register(RegisterDto registerDto);
+    RegisteredUserDto register(RegisterDto registerDto, boolean isBootstrap);
 
     Optional<RegisteredUserDto> authorize(AccountDto accountDto);
 

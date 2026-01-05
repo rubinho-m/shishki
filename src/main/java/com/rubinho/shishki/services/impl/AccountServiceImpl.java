@@ -48,8 +48,8 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public RegisteredUserDto register(RegisterDto registerDto) {
-        if (!ALLOWED_REGISTERING_ROLES.contains(registerDto.getRole())) {
+    public RegisteredUserDto register(RegisterDto registerDto, boolean isBootstrap) {
+        if (!ALLOWED_REGISTERING_ROLES.contains(registerDto.getRole()) && !isBootstrap) {
             throw new ForbiddenException();
         }
         final Account account = accountMapper.toEntity(registerDto);
