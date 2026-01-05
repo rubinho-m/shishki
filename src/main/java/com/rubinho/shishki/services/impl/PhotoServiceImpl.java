@@ -1,6 +1,7 @@
 package com.rubinho.shishki.services.impl;
 
 import com.rubinho.shishki.enums.StorageType;
+import com.rubinho.shishki.exceptions.rest.ForbiddenException;
 import com.rubinho.shishki.model.Account;
 import com.rubinho.shishki.model.PhotoOwner;
 import com.rubinho.shishki.model.Role;
@@ -10,12 +11,11 @@ import com.rubinho.shishki.repository.impl.FSPhotoRepository;
 import com.rubinho.shishki.repository.impl.S3PhotoRepository;
 import com.rubinho.shishki.services.PhotoService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 @Service
@@ -64,9 +64,9 @@ public class PhotoServiceImpl implements PhotoService {
     }
 
     @Override
-    public void checkIfExists(StorageType storageType, String fileName) {
+    public void checkIfExists(StorageType storageType, String fileName) throws FileNotFoundException {
         if (!getPhotoRepository(storageType).exists(fileName)) {
-            throw new IllegalStateException("File: %s doesn't exist".formatted(fileName));
+            throw new FileNotFoundException("File: %s doesn't exist".formatted(fileName));
         }
     }
 
@@ -84,7 +84,7 @@ public class PhotoServiceImpl implements PhotoService {
         final PhotoOwner photoOwner = photoOwnerRepository.getPhotoOwnerByFileName(fileName)
                 .orElseThrow(() -> new IllegalStateException("Not found photo: %s".formatted(fileName)));
         if (!photoOwner.getOwner().equals(account)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not owner of this photo");
+            throw new ForbiddenException("You are not owner of this photo");
         }
     }
 }

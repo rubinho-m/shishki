@@ -2,6 +2,10 @@ package com.rubinho.shishki.rest.impl;
 
 import com.rubinho.shishki.dto.GlampingRequestDto;
 import com.rubinho.shishki.dto.GlampingResponseDto;
+import com.rubinho.shishki.exceptions.AccountNotFoundException;
+import com.rubinho.shishki.exceptions.rest.BadRequestException;
+import com.rubinho.shishki.exceptions.rest.NotFoundException;
+import com.rubinho.shishki.exceptions.rest.UnauthorizedException;
 import com.rubinho.shishki.model.Account;
 import com.rubinho.shishki.rest.GlampingApi;
 import com.rubinho.shishki.rest.versions.ApiVersioningUtils;
@@ -14,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.FileNotFoundException;
 import java.util.List;
 
 @RestController
@@ -46,21 +51,30 @@ public class GlampingApiImpl implements GlampingApi {
 
     @Override
     public ResponseEntity<GlampingResponseDto> get(Long id) {
-        return ResponseEntity.ok(glampingService.get(id));
+        return ResponseEntity.ok(
+                glampingService.get(id)
+                        .orElseThrow(() -> new NotFoundException("Glamping with id %d not found".formatted(id)))
+        );
     }
 
     @Override
     public ResponseEntity<GlampingResponseDto> add(HttpServletRequest httpServletRequest,
                                                    GlampingRequestDto glampingRequestDto,
                                                    String token) {
-        final Account account = accountService.getAccountByToken(token);
-        photoService.checkIfExists(
-                apiVersioningUtils.storageType(httpServletRequest.getRequestURI()),
-                glampingRequestDto.getPhotoName()
-        );
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(glampingService.save(glampingRequestDto, account));
+        final Account account = getAccount(token);
+        try {
+            photoService.checkIfExists(
+                    apiVersioningUtils.storageType(httpServletRequest.getRequestURI()),
+                    glampingRequestDto.getPhotoName()
+            );
+            return ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .body(glampingService.save(glampingRequestDto, account));
+        } catch (FileNotFoundException e) {
+            throw new BadRequestException(e.getMessage());
+        } catch (AccountNotFoundException e) {
+            throw new NotFoundException(e.getMessage());
+        }
     }
 
     @Override
@@ -68,20 +82,33 @@ public class GlampingApiImpl implements GlampingApi {
                                                     Long id,
                                                     GlampingRequestDto newGlampingRequestDto,
                                                     String token) {
-        final Account account = accountService.getAccountByToken(token);
-        photoService.checkIfExists(
-                apiVersioningUtils.storageType(httpServletRequest.getRequestURI()),
-                newGlampingRequestDto.getPhotoName()
-        );
-        return ResponseEntity
-                .status(HttpStatus.ACCEPTED)
-                .body(glampingService.edit(id, newGlampingRequestDto, account));
+        final Account account = getAccount(token);
+        try {
+            photoService.checkIfExists(
+                    apiVersioningUtils.storageType(httpServletRequest.getRequestURI()),
+                    newGlampingRequestDto.getPhotoName()
+            );
+            final GlampingResponseDto glamping = glampingService.edit(id, newGlampingRequestDto, account)
+                    .orElseThrow(() -> new NotFoundException("Glamping with id %d not found".formatted(id)));
+            return ResponseEntity
+                    .status(HttpStatus.ACCEPTED)
+                    .body(glamping);
+        } catch (FileNotFoundException e) {
+            throw new BadRequestException(e.getMessage());
+        } catch (AccountNotFoundException e) {
+            throw new NotFoundException(e.getMessage());
+        }
     }
 
     @Override
     public ResponseEntity<Void> delete(Long id, String token) {
-        final Account account = accountService.getAccountByToken(token);
+        final Account account = getAccount(token);
         glampingService.delete(id, account);
         return ResponseEntity.noContent().build();
+    }
+
+    private Account getAccount(String token) {
+        return accountService.getAccountByToken(token)
+                .orElseThrow(() -> new UnauthorizedException("Not found user by auth token"));
     }
 }

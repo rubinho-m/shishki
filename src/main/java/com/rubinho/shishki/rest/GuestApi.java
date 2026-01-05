@@ -1,5 +1,6 @@
 package com.rubinho.shishki.rest;
 
+import com.rubinho.shishki.config.Authenticated;
 import com.rubinho.shishki.dto.GuestDto;
 import com.rubinho.shishki.rest.versions.ApiVersioned;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Set;
 
 @ApiVersioned(path = {"/api/v1", "/api/v2"})
+@Authenticated
 public interface GuestApi {
     @GetMapping("/guests")
     ResponseEntity<List<GuestDto>> getAll();

@@ -2,15 +2,13 @@ package com.rubinho.shishki.services.impl;
 
 import com.rubinho.shishki.dto.ShopItemDto;
 import com.rubinho.shishki.mappers.ShopItemMapper;
-import com.rubinho.shishki.model.ShopItem;
 import com.rubinho.shishki.repository.ShopItemRepository;
 import com.rubinho.shishki.services.ShopItemService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ShopItemServiceImpl implements ShopItemService {
@@ -33,13 +31,8 @@ public class ShopItemServiceImpl implements ShopItemService {
     }
 
     @Override
-    public ShopItemDto get(Long id) {
-        return shopItemMapper.toDto(
-                shopItemRepository.findById(id)
-                        .orElseThrow(
-                                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No item by this id")
-                        )
-        );
+    public Optional<ShopItemDto> get(Long id) {
+        return shopItemRepository.findById(id).map(shopItemMapper::toDto);
     }
 
     @Override
@@ -52,15 +45,16 @@ public class ShopItemServiceImpl implements ShopItemService {
     }
 
     @Override
-    public ShopItemDto edit(Long id, ShopItemDto shopItemDto) {
+    public Optional<ShopItemDto> edit(Long id, ShopItemDto shopItemDto) {
+        if (!shopItemRepository.existsById(id)) {
+            return Optional.empty();
+        }
         shopItemDto.setId(id);
-        return save(shopItemDto);
+        return Optional.of(save(shopItemDto));
     }
 
     @Override
     public void delete(Long id) {
-        final ShopItem shopItem = shopItemRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No item by this id"));
-        shopItemRepository.delete(shopItem);
+        shopItemRepository.findById(id).ifPresent(shopItemRepository::delete);
     }
 }

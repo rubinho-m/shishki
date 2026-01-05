@@ -1,5 +1,6 @@
 package com.rubinho.shishki.rest.versions.v1;
 
+import com.rubinho.shishki.config.AdminAuthorization;
 import com.rubinho.shishki.dto.GlampingResponseDto;
 import com.rubinho.shishki.dto.PotentialOwnerDto;
 import com.rubinho.shishki.dto.SecuredAccountDto;
@@ -13,6 +14,7 @@ import java.util.List;
 
 @Deprecated(since = "v2")
 @ApiVersioned(path = {"/api/v1"})
+@AdminAuthorization
 public interface AdminApiV1 {
     @GetMapping("/admin/owners")
     ResponseEntity<List<PotentialOwnerDto>> getAllPotentialOwners();

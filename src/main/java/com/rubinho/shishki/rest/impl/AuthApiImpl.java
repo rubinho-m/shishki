@@ -3,6 +3,7 @@ package com.rubinho.shishki.rest.impl;
 import com.rubinho.shishki.dto.AccountDto;
 import com.rubinho.shishki.dto.RegisterDto;
 import com.rubinho.shishki.dto.RegisteredUserDto;
+import com.rubinho.shishki.exceptions.rest.UnauthorizedException;
 import com.rubinho.shishki.rest.AuthApi;
 import com.rubinho.shishki.services.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,11 +21,15 @@ public class AuthApiImpl implements AuthApi {
 
     @Override
     public ResponseEntity<RegisteredUserDto> register(RegisterDto registerDto) {
-        return ResponseEntity.ok(accountService.register(registerDto));
+        return ResponseEntity.ok(accountService.register(registerDto, false));
     }
 
     @Override
     public ResponseEntity<RegisteredUserDto> authorize(AccountDto accountDto) {
-        return ResponseEntity.ok(accountService.authorize(accountDto));
+        return ResponseEntity.ok(
+                accountService.authorize(accountDto).orElseThrow(
+                        () -> new UnauthorizedException("User %s not found".formatted(accountDto.getLogin()))
+                )
+        );
     }
 }

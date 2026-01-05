@@ -3,6 +3,9 @@ package com.rubinho.shishki.services.impl;
 import com.rubinho.shishki.dto.AccountDto;
 import com.rubinho.shishki.dto.RegisterDto;
 import com.rubinho.shishki.dto.RegisteredUserDto;
+import com.rubinho.shishki.exceptions.rest.ForbiddenException;
+import com.rubinho.shishki.exceptions.rest.UnauthorizedException;
+import com.rubinho.shishki.jwt.JwtUtils;
 import com.rubinho.shishki.jwt.UserAuthProvider;
 import com.rubinho.shishki.mappers.AccountMapper;
 import com.rubinho.shishki.model.Account;
@@ -11,12 +14,11 @@ import com.rubinho.shishki.repository.AccountRepository;
 import com.rubinho.shishki.repository.GuestRepository;
 import com.rubinho.shishki.services.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.nio.CharBuffer;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -26,6 +28,7 @@ public class AccountServiceImpl implements AccountService {
     private final AccountRepository accountRepository;
     private final AccountMapper accountMapper;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtils jwtUtils;
 
     private final Set<Role> ALLOWED_REGISTERING_ROLES = Set.of(Role.USER, Role.OWNER);
 
@@ -34,18 +37,20 @@ public class AccountServiceImpl implements AccountService {
                               AccountRepository accountRepository,
                               GuestRepository guestRepository,
                               AccountMapper accountMapper,
-                              PasswordEncoder passwordEncoder) {
+                              PasswordEncoder passwordEncoder,
+                              JwtUtils jwtUtils) {
         this.userAuthProvider = userAuthProvider;
         this.accountRepository = accountRepository;
         this.guestRepository = guestRepository;
         this.accountMapper = accountMapper;
         this.passwordEncoder = passwordEncoder;
+        this.jwtUtils = jwtUtils;
     }
 
     @Override
-    public RegisteredUserDto register(RegisterDto registerDto) {
-        if (!ALLOWED_REGISTERING_ROLES.contains(registerDto.getRole())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+    public RegisteredUserDto register(RegisterDto registerDto, boolean isBootstrap) {
+        if (!ALLOWED_REGISTERING_ROLES.contains(registerDto.getRole()) && !isBootstrap) {
+            throw new ForbiddenException();
         }
         final Account account = accountMapper.toEntity(registerDto);
         account.setPassword(passwordEncoder.encode(CharBuffer.wrap(registerDto.getPassword())));
@@ -57,29 +62,26 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public RegisteredUserDto authorize(AccountDto accountDto) {
-        final Account account = accountRepository.findByLogin(accountDto.getLogin())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "No such account"));
-
-        if (passwordEncoder.matches(CharBuffer.wrap(accountDto.getPassword()), account.getPassword())) {
-            final RegisteredUserDto registeredUserDto = accountMapper.toRegisteredUserDto(account);
-            registeredUserDto.setToken(userAuthProvider.createToken(account.getLogin(), account.getRole()));
-            return registeredUserDto;
-        }
-
-        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Bad credentials");
+    public Optional<RegisteredUserDto> authorize(AccountDto accountDto) {
+        return accountRepository.findByLogin(accountDto.getLogin())
+                .map(account -> {
+                    if (passwordEncoder.matches(CharBuffer.wrap(accountDto.getPassword()), account.getPassword())) {
+                        final RegisteredUserDto registeredUserDto = accountMapper.toRegisteredUserDto(account);
+                        registeredUserDto.setToken(userAuthProvider.createToken(account.getLogin(), account.getRole()));
+                        return registeredUserDto;
+                    }
+                    throw new UnauthorizedException();
+                });
     }
 
     @Override
-    public Account getAccountByToken(String token) {
-        final String login = userAuthProvider.getLoginFromJwt(token.split(" ")[1]);
-        return accountRepository.findByLogin(login)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "No such user"));
+    public Optional<Account> getAccountByToken(String token) {
+        final String login = userAuthProvider.getLoginFromJwt(jwtUtils.escapeToken(token));
+        return accountRepository.findByLogin(login);
     }
 
     @Override
-    public Account getAccountById(Long id) {
-        return accountRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "No such user"));
+    public Optional<Account> getAccountById(Long id) {
+        return accountRepository.findById(id);
     }
 }

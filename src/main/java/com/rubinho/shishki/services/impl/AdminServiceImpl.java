@@ -13,11 +13,10 @@ import com.rubinho.shishki.repository.AccountRepository;
 import com.rubinho.shishki.repository.GlampingRepository;
 import com.rubinho.shishki.services.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AdminServiceImpl implements AdminService {
@@ -62,18 +61,20 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public void setNewGlampingStatus(Long id, GlampingStatus glampingStatus) {
-        final Glamping glamping = glampingRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Glamping not found"));
-        glamping.setGlampingStatus(glampingStatus);
-        glampingRepository.save(glamping);
+    public Optional<Glamping> setNewGlampingStatus(Long id, GlampingStatus glampingStatus)  {
+        return glampingRepository.findById(id)
+                .map(glamping -> {
+                    glamping.setGlampingStatus(glampingStatus);
+                    return glampingRepository.save(glamping);
+                });
     }
 
     @Override
-    public void setNewRole(Long id, Role role) {
-        final Account account = accountRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found"));
-        account.setRole(role);
-        accountRepository.save(account);
+    public Optional<Account> setNewRole(Long id, Role role) {
+        return accountRepository.findById(id)
+                        .map(account -> {
+                            account.setRole(role);
+                            return accountRepository.save(account);
+                        });
     }
 }

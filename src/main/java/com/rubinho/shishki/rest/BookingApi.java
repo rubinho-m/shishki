@@ -1,5 +1,6 @@
 package com.rubinho.shishki.rest;
 
+import com.rubinho.shishki.config.Authenticated;
 import com.rubinho.shishki.dto.BookingRequestDto;
 import com.rubinho.shishki.dto.BookingResponseDto;
 import com.rubinho.shishki.rest.versions.ApiVersioned;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import java.util.List;
 
 @ApiVersioned(path = {"/api/v1", "/api/v2"})
+@Authenticated
 public interface BookingApi {
     @GetMapping("/bookings")
     ResponseEntity<List<BookingResponseDto>> getAll();

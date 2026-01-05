@@ -2,14 +2,13 @@ package com.rubinho.shishki.mappers.impl;
 
 import com.rubinho.shishki.dto.GlampingRequestDto;
 import com.rubinho.shishki.dto.GlampingResponseDto;
+import com.rubinho.shishki.exceptions.AccountNotFoundException;
 import com.rubinho.shishki.mappers.GlampingMapper;
 import com.rubinho.shishki.model.Account;
 import com.rubinho.shishki.model.Glamping;
 import com.rubinho.shishki.repository.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class GlampingMapperImpl implements GlampingMapper {
@@ -21,9 +20,9 @@ public class GlampingMapperImpl implements GlampingMapper {
     }
 
     @Override
-    public Glamping toEntity(GlampingRequestDto glampingRequestDto) {
+    public Glamping toEntity(GlampingRequestDto glampingRequestDto) throws AccountNotFoundException {
         final Account account = accountRepository.findByLogin(glampingRequestDto.getOwnerLogin())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found"));
+                .orElseThrow(() -> new AccountNotFoundException(glampingRequestDto.getOwnerLogin()));
         return Glamping.builder()
                 .description(glampingRequestDto.getDescription())
                 .address(glampingRequestDto.getAddress())

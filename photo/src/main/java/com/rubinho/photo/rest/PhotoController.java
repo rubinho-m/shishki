@@ -43,7 +43,7 @@ public class PhotoController {
     @GetMapping("/{fileName}/exists")
     public ResponseEntity<Boolean> exists(@PathVariable String fileName) {
         return ResponseEntity.ok()
-                .contentType(MediaType.IMAGE_JPEG)
+                .contentType(MediaType.APPLICATION_JSON)
                 .body(minioPhotoService.exists(fileName));
     }
 

@@ -1,5 +1,8 @@
 package com.rubinho.shishki.rest;
 
+import com.rubinho.shishki.config.AdminAuthorization;
+import com.rubinho.shishki.config.NoAuth;
+import com.rubinho.shishki.config.OwnerAuthorization;
 import com.rubinho.shishki.dto.GlampingRequestDto;
 import com.rubinho.shishki.dto.GlampingResponseDto;
 import com.rubinho.shishki.rest.versions.ApiVersioned;
@@ -18,25 +21,31 @@ import java.util.List;
 @ApiVersioned(path = {"/api/v1", "/api/v2"})
 public interface GlampingApi {
     @GetMapping("/glampings")
+    @NoAuth
     ResponseEntity<List<GlampingResponseDto>> getAll();
 
     @GetMapping("/glampings/approved")
+    @NoAuth
     ResponseEntity<List<GlampingResponseDto>> getAllApproved();
 
     @GetMapping("/glampings/{id}")
+    @NoAuth
     ResponseEntity<GlampingResponseDto> get(@PathVariable Long id);
 
     @PostMapping("/glampings")
+    @NoAuth
     ResponseEntity<GlampingResponseDto> add(HttpServletRequest httpServletRequest,
                                             @RequestBody GlampingRequestDto glampingRequestDto,
                                             @RequestHeader("Authorization") String token);
 
     @PutMapping("/glampings/{id}")
+    @OwnerAuthorization
     ResponseEntity<GlampingResponseDto> edit(HttpServletRequest httpServletRequest,
                                              @PathVariable Long id,
                                              @RequestBody GlampingRequestDto newGlampingRequestDto,
                                              @RequestHeader("Authorization") String token);
 
     @DeleteMapping("/glampings/{id}")
+    @OwnerAuthorization
     ResponseEntity<Void> delete(@PathVariable Long id, @RequestHeader("Authorization") String token);
 }

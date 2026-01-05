@@ -4,6 +4,7 @@ import com.rubinho.shishki.enums.StorageType;
 import com.rubinho.shishki.model.Account;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public interface PhotoService {
@@ -17,5 +18,5 @@ public interface PhotoService {
 
     void delete(StorageType storageType, String fileName, Account account);
 
-    void checkIfExists(StorageType storageType, String fileName);
+    void checkIfExists(StorageType storageType, String fileName) throws FileNotFoundException;
 }

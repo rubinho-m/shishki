@@ -3,17 +3,13 @@ package com.rubinho.shishki.services.impl;
 import com.rubinho.shishki.dto.GuestDto;
 import com.rubinho.shishki.mappers.GuestMapper;
 import com.rubinho.shishki.model.Account;
-import com.rubinho.shishki.model.Booking;
-import com.rubinho.shishki.model.Guest;
 import com.rubinho.shishki.repository.GuestRepository;
 import com.rubinho.shishki.services.GuestService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -46,13 +42,8 @@ public class GuestServiceImpl implements GuestService {
     }
 
     @Override
-    public GuestDto get(Long id) {
-        return guestMapper.toDto(
-                guestRepository.findById(id)
-                        .orElseThrow(
-                                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No guest by this id")
-                        )
-        );
+    public Optional<GuestDto> get(Long id) {
+        return guestRepository.findById(id).map(guestMapper::toDto);
     }
 
     @Override
@@ -65,15 +56,16 @@ public class GuestServiceImpl implements GuestService {
     }
 
     @Override
-    public GuestDto edit(Long id, GuestDto guestDto) {
+    public Optional<GuestDto> edit(Long id, GuestDto guestDto) {
+        if (!guestRepository.existsById(id)) {
+            return Optional.empty();
+        }
         guestDto.setId(id);
-        return save(guestDto);
+        return Optional.of(save(guestDto));
     }
 
     @Override
     public void delete(Long id) {
-        final Guest guest = guestRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No guest by this id"));
-        guestRepository.delete(guest);
+        guestRepository.findById(id).ifPresent(guestRepository::delete);
     }
 }
