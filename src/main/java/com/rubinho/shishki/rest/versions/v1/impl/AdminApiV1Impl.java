@@ -3,7 +3,7 @@ package com.rubinho.shishki.rest.versions.v1.impl;
 import com.rubinho.shishki.dto.GlampingResponseDto;
 import com.rubinho.shishki.dto.PotentialOwnerDto;
 import com.rubinho.shishki.dto.SecuredAccountDto;
-import com.rubinho.shishki.exceptions.NotFoundException;
+import com.rubinho.shishki.exceptions.rest.NotFoundException;
 import com.rubinho.shishki.model.GlampingStatus;
 import com.rubinho.shishki.model.Role;
 import com.rubinho.shishki.rest.versions.v1.AdminApiV1;

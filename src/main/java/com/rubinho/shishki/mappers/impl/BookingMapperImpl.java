@@ -5,7 +5,7 @@ import com.rubinho.shishki.dto.BookingRequestDto;
 import com.rubinho.shishki.dto.BookingResponseDto;
 import com.rubinho.shishki.dto.GuestDto;
 import com.rubinho.shishki.dto.ShopItemDto;
-import com.rubinho.shishki.exceptions.NotFoundException;
+import com.rubinho.shishki.exceptions.rest.NotFoundException;
 import com.rubinho.shishki.mappers.AdditionalServiceMapper;
 import com.rubinho.shishki.mappers.BookingMapper;
 import com.rubinho.shishki.mappers.GuestMapper;

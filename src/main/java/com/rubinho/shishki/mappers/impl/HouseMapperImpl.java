@@ -1,7 +1,7 @@
 package com.rubinho.shishki.mappers.impl;
 
 import com.rubinho.shishki.dto.HouseDto;
-import com.rubinho.shishki.exceptions.NotFoundException;
+import com.rubinho.shishki.exceptions.rest.NotFoundException;
 import com.rubinho.shishki.mappers.HouseMapper;
 import com.rubinho.shishki.model.Glamping;
 import com.rubinho.shishki.model.House;

@@ -2,9 +2,9 @@ package com.rubinho.shishki.rest.impl;
 
 import com.rubinho.shishki.dto.HouseDto;
 import com.rubinho.shishki.enums.StorageType;
-import com.rubinho.shishki.exceptions.BadRequestException;
-import com.rubinho.shishki.exceptions.NotFoundException;
-import com.rubinho.shishki.exceptions.UnauthorizedException;
+import com.rubinho.shishki.exceptions.rest.BadRequestException;
+import com.rubinho.shishki.exceptions.rest.NotFoundException;
+import com.rubinho.shishki.exceptions.rest.UnauthorizedException;
 import com.rubinho.shishki.filters.HouseFilter;
 import com.rubinho.shishki.model.Account;
 import com.rubinho.shishki.model.Glamping;

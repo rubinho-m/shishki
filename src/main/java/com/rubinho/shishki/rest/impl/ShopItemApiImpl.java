@@ -1,8 +1,8 @@
 package com.rubinho.shishki.rest.impl;
 
 import com.rubinho.shishki.dto.ShopItemDto;
-import com.rubinho.shishki.exceptions.BadRequestException;
-import com.rubinho.shishki.exceptions.NotFoundException;
+import com.rubinho.shishki.exceptions.rest.BadRequestException;
+import com.rubinho.shishki.exceptions.rest.NotFoundException;
 import com.rubinho.shishki.rest.ShopItemApi;
 import com.rubinho.shishki.services.ShopItemService;
 import org.springframework.beans.factory.annotation.Autowired;

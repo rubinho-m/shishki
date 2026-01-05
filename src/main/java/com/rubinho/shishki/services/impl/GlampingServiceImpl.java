@@ -2,7 +2,7 @@ package com.rubinho.shishki.services.impl;
 
 import com.rubinho.shishki.dto.GlampingRequestDto;
 import com.rubinho.shishki.dto.GlampingResponseDto;
-import com.rubinho.shishki.exceptions.ForbiddenException;
+import com.rubinho.shishki.exceptions.rest.ForbiddenException;
 import com.rubinho.shishki.mappers.GlampingMapper;
 import com.rubinho.shishki.model.Account;
 import com.rubinho.shishki.model.Glamping;

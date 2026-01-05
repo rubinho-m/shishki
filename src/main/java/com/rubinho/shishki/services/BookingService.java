@@ -2,7 +2,7 @@ package com.rubinho.shishki.services;
 
 import com.rubinho.shishki.dto.BookingRequestDto;
 import com.rubinho.shishki.dto.BookingResponseDto;
-import com.rubinho.shishki.exceptions.BookingValidationException;
+import com.rubinho.shishki.exceptions.rest.BookingValidationException;
 import com.rubinho.shishki.model.Account;
 
 import java.util.List;

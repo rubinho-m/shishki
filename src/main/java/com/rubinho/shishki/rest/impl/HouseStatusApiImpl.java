@@ -1,7 +1,7 @@
 package com.rubinho.shishki.rest.impl;
 
 import com.rubinho.shishki.dto.HouseStatusDto;
-import com.rubinho.shishki.exceptions.NotFoundException;
+import com.rubinho.shishki.exceptions.rest.NotFoundException;
 import com.rubinho.shishki.rest.HouseStatusApi;
 import com.rubinho.shishki.services.HouseStatusService;
 import org.springframework.beans.factory.annotation.Autowired;

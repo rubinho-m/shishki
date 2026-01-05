@@ -1,7 +1,7 @@
 package com.rubinho.shishki.services.impl;
 
 import com.rubinho.shishki.dto.HouseDto;
-import com.rubinho.shishki.exceptions.ForbiddenException;
+import com.rubinho.shishki.exceptions.rest.ForbiddenException;
 import com.rubinho.shishki.filters.HouseFilter;
 import com.rubinho.shishki.mappers.HouseMapper;
 import com.rubinho.shishki.model.Account;

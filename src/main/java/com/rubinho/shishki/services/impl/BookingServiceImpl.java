@@ -2,8 +2,8 @@ package com.rubinho.shishki.services.impl;
 
 import com.rubinho.shishki.dto.BookingRequestDto;
 import com.rubinho.shishki.dto.BookingResponseDto;
-import com.rubinho.shishki.exceptions.BookingValidationException;
-import com.rubinho.shishki.exceptions.ForbiddenException;
+import com.rubinho.shishki.exceptions.rest.BookingValidationException;
+import com.rubinho.shishki.exceptions.rest.ForbiddenException;
 import com.rubinho.shishki.mappers.BookingMapper;
 import com.rubinho.shishki.model.Account;
 import com.rubinho.shishki.model.Booking;

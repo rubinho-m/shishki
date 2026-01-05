@@ -1,4 +1,4 @@
-package com.rubinho.shishki.exceptions;
+package com.rubinho.shishki.exceptions.rest;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.Nullable;

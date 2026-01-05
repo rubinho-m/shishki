@@ -1,6 +1,6 @@
 package com.rubinho.shishki.repository.impl;
 
-import com.rubinho.shishki.exceptions.BadRequestException;
+import com.rubinho.shishki.exceptions.rest.BadRequestException;
 import com.rubinho.shishki.repository.PhotoRepository;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Repository;

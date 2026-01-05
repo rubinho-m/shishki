@@ -1,8 +1,8 @@
 package com.rubinho.shishki.rest.impl;
 
 import com.rubinho.shishki.dto.HouseTypeDto;
-import com.rubinho.shishki.exceptions.BadRequestException;
-import com.rubinho.shishki.exceptions.NotFoundException;
+import com.rubinho.shishki.exceptions.rest.BadRequestException;
+import com.rubinho.shishki.exceptions.rest.NotFoundException;
 import com.rubinho.shishki.rest.HouseTypeApi;
 import com.rubinho.shishki.services.HouseTypeService;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,8 +1,8 @@
 package com.rubinho.shishki.rest.impl;
 
 import com.rubinho.shishki.dto.AdditionalServiceDto;
-import com.rubinho.shishki.exceptions.BadRequestException;
-import com.rubinho.shishki.exceptions.NotFoundException;
+import com.rubinho.shishki.exceptions.rest.BadRequestException;
+import com.rubinho.shishki.exceptions.rest.NotFoundException;
 import com.rubinho.shishki.rest.AdditionalServiceApi;
 import com.rubinho.shishki.services.AdditionalServiceService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +10,6 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 

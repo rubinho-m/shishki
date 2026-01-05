@@ -1,7 +1,7 @@
 package com.rubinho.shishki.mappers.impl;
 
 import com.rubinho.shishki.dto.ReviewDto;
-import com.rubinho.shishki.exceptions.NotFoundException;
+import com.rubinho.shishki.exceptions.rest.NotFoundException;
 import com.rubinho.shishki.mappers.ReviewMapper;
 import com.rubinho.shishki.model.Account;
 import com.rubinho.shishki.model.Glamping;

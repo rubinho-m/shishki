@@ -2,10 +2,10 @@ package com.rubinho.shishki.rest.impl;
 
 import com.rubinho.shishki.dto.BookingRequestDto;
 import com.rubinho.shishki.dto.BookingResponseDto;
-import com.rubinho.shishki.exceptions.BadRequestException;
-import com.rubinho.shishki.exceptions.BookingValidationException;
-import com.rubinho.shishki.exceptions.NotFoundException;
-import com.rubinho.shishki.exceptions.UnauthorizedException;
+import com.rubinho.shishki.exceptions.rest.BadRequestException;
+import com.rubinho.shishki.exceptions.rest.BookingValidationException;
+import com.rubinho.shishki.exceptions.rest.NotFoundException;
+import com.rubinho.shishki.exceptions.rest.UnauthorizedException;
 import com.rubinho.shishki.model.Account;
 import com.rubinho.shishki.rest.BookingApi;
 import com.rubinho.shishki.services.AccountService;

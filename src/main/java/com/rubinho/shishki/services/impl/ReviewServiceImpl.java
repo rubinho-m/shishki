@@ -1,7 +1,7 @@
 package com.rubinho.shishki.services.impl;
 
 import com.rubinho.shishki.dto.ReviewDto;
-import com.rubinho.shishki.exceptions.ForbiddenException;
+import com.rubinho.shishki.exceptions.rest.ForbiddenException;
 import com.rubinho.shishki.mappers.ReviewMapper;
 import com.rubinho.shishki.model.Account;
 import com.rubinho.shishki.model.Role;

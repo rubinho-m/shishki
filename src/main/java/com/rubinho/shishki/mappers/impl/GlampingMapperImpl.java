@@ -2,7 +2,7 @@ package com.rubinho.shishki.mappers.impl;
 
 import com.rubinho.shishki.dto.GlampingRequestDto;
 import com.rubinho.shishki.dto.GlampingResponseDto;
-import com.rubinho.shishki.exceptions.NotFoundException;
+import com.rubinho.shishki.exceptions.rest.NotFoundException;
 import com.rubinho.shishki.mappers.GlampingMapper;
 import com.rubinho.shishki.model.Account;
 import com.rubinho.shishki.model.Glamping;
