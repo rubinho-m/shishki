@@ -18,31 +18,20 @@ import java.util.List;
 @Profile("init")
 public class CreateServiceUsersRunner implements CommandLineRunner {
     private final AccountService accountService;
-    private final ObjectMapper objectMapper;
+    private final ServiceUserProvider serviceUserProvider;
 
     @Autowired
     public CreateServiceUsersRunner(AccountService accountService,
-                                    ObjectMapper objectMapper) {
+                                    ServiceUserProvider serviceUserProvider) {
         this.accountService = accountService;
-        this.objectMapper = objectMapper;
+        this.serviceUserProvider = serviceUserProvider;
     }
 
     @Override
     public void run(String... args) throws IOException {
-        final List<RegisterDto> serviceUsers = read();
+        final List<RegisterDto> serviceUsers = serviceUserProvider.provide();
         for (RegisterDto serviceUser: serviceUsers) {
             accountService.register(serviceUser, true);
-        }
-    }
-
-    private List<RegisterDto> read() throws IOException {
-        final ClassPathResource resource = new ClassPathResource("service-users.json");
-        try (InputStream inputStream = resource.getInputStream()) {
-            return objectMapper.readValue(
-                    inputStream,
-                    new TypeReference<>() {
-                    }
-            );
         }
     }
 }
