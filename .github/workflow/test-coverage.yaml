@@ -1,0 +1,80 @@
+name: Test and Code Coverage
+
+on:
+  push:
+    branches: [ main, develop, feature/* ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        java-version: [17, 21]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK ${{ matrix.java-version }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ matrix.java-version }}
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Run tests with coverage
+        run: ./gradlew clean test jacocoTestReport --no-daemon
+
+      - name: Upload JaCoCo coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report-${{ matrix.java-version }}
+          path: |
+            build/reports/jacoco/test/
+            build/reports/jacoco/test/html/
+            build/reports/jacoco/test/jacocoTestReport.xml
+
+      - name: Generate coverage summary
+        id: coverage
+        run: |
+          # Парсим coverage из XML отчета
+          COVERAGE=$(grep -oP 'line-rate="\K[0-9.]+' build/reports/jacoco/test/jacocoTestReport.xml | head -1)
+          PERCENTAGE=$(echo "$COVERAGE * 100" | bc -l | xargs printf "%.2f")
+          echo "coverage=$PERCENTAGE" >> $GITHUB_OUTPUT
+          echo "Coverage: $PERCENTAGE%"
+
+      - name: Comment on PR with coverage
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { coverage } = require('./build/reports/jacoco/test/jacocoTestReport.json');
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## 📊 Code Coverage Report
+              **Overall Coverage:** ${(coverage.overall * 100).toFixed(2)}%
+              **Line Coverage:** ${(coverage.line * 100).toFixed(2)}%
+              **Branch Coverage:** ${(coverage.branch * 100).toFixed(2)}%
+            
+              [View Full Report](${process.env.GITHUB_SERVER_URL}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})
+              `
+            });
+
+      - name: Publish Test Report
+        if: always()
+        uses: dorny/test-reporter@v1
+        with:
+          name: Test Results - Java ${{ matrix.java-version }}
+          path: build/test-results/test/**/*.xml
+          reporter: java-junit
+          fail-on-error: false
