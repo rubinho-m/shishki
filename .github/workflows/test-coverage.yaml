@@ -15,6 +15,15 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+      - name: Cache Gradle packages
+        uses: actions/cache@v5.0.1
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            gradle-${{ runner.os }}-
       - name: Run Coverage
         run: |
           chmod +x gradlew
