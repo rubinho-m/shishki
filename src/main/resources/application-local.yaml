@@ -4,6 +4,10 @@ spring:
       enabled: true
       file: development/docker/postgres/compose.yaml
       lifecycle-management: start_only
+  datasource:
+    url: ${POSTGRES_URL:jdbc:postgresql://localhost:5433/postgres}
+    username: ${POSTGRES_USERNAME:postgres}
+    password: ${POSTGRES_PASSWORD:postgres}
   jpa:
     hibernate:
       ddl-auto: create

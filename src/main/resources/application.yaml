@@ -5,10 +5,6 @@ spring:
     multipart:
       max-file-size: 10MB
       max-request-size: 10MB
-  datasource:
-    url: ${POSTGRES_URL}
-    username: ${POSTGRES_USERNAME}
-    password: ${POSTGRES_PASSWORD}
 server:
   port: ${SHISHKI_PORT:6128}
 photo-service:
