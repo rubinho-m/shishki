@@ -28,3 +28,5 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           min-coverage-overall: 0
           min-coverage-changed-files: 0
+          title: Code Coverage
+          update-comment: true
