@@ -6,6 +6,7 @@ import com.rubinho.shishki.dto.RegisterDto;
 import com.rubinho.shishki.services.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +15,7 @@ import java.io.InputStream;
 import java.util.List;
 
 @Component
+@Profile("init")
 public class CreateServiceUsersRunner implements CommandLineRunner {
     private final AccountService accountService;
     private final ObjectMapper objectMapper;

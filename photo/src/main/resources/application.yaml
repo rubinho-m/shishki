@@ -1,4 +1,9 @@
 spring:
+  docker:
+    compose:
+      enabled: true
+      file: development/docker/minio/compose.yaml
+      lifecycle-management: start_only
   servlet:
     multipart:
       max-file-size: 10MB

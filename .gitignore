@@ -38,3 +38,5 @@ out/
 
 ### Private ###
 /src/main/resources/service-users.json
+/development/docker/postgres/.env
+/development/docker/minio/.env

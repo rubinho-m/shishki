@@ -9,17 +9,9 @@ spring:
     url: ${POSTGRES_URL}
     username: ${POSTGRES_USERNAME}
     password: ${POSTGRES_PASSWORD}
-  sql:
-    init:
-      mode: always
-  jpa:
-    hibernate:
-      ddl-auto: create
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-    defer-datasource-initialization: true
-photo-service:
-  url: http://localhost:6129
 server:
-  port: 6128
+  port: ${SHISHKI_PORT:6128}
+photo-service:
+  url: ${PHOTO_SERVICE_URL:http://localhost:6129}
+frontend:
+  url: ${FRONTEND_URL:http://localhost:3000/}
