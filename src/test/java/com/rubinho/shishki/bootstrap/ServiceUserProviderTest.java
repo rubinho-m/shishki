@@ -1,29 +1,20 @@
 package com.rubinho.shishki.bootstrap;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rubinho.shishki.dto.GuestDto;
 import com.rubinho.shishki.dto.RegisterDto;
+import com.rubinho.shishki.model.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.assertThat;
 
-@ExtendWith(MockitoExtension.class)
 public class ServiceUserProviderTest {
     private ServiceUserProvider serviceUserProvider;
 
-    @Mock
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     void init() {
@@ -32,11 +23,29 @@ public class ServiceUserProviderTest {
 
     @Test
     void provideTest() throws IOException {
-        final List<RegisterDto> expectedList = List.of(mock(), mock());
+        final GuestDto guest = GuestDto.builder()
+                .name("test")
+                .surname("test")
+                .phone("1234")
+                .email("test@mail.ru")
+                .build();
 
-        when(objectMapper.readValue(any(InputStream.class), any(TypeReference.class)))
-                .thenReturn(expectedList);
+        final RegisterDto first = RegisterDto.builder()
+                .login("test")
+                .password("test")
+                .role(Role.ADMIN)
+                .guest(guest)
+                .build();
 
-        assertEquals(expectedList, serviceUserProvider.provide());
+        final RegisterDto second = RegisterDto.builder()
+                .login("test2")
+                .password("test2")
+                .role(Role.OWNER)
+                .guest(guest)
+                .build();
+
+        assertThat(serviceUserProvider.provide())
+                .hasSize(2)
+                .contains(first, second);
     }
 }
