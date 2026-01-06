@@ -1,0 +1,2 @@
+include:
+  - photo/docker-compose.yaml
