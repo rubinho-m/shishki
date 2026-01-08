@@ -68,10 +68,10 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     private void check(String login, Account account) {
-        if (account.getRole().equals(Role.ADMIN)){
+        if (Role.ADMIN.equals(account.getRole())) {
             return;
         }
-        if (!account.getLogin().equals(login)){
+        if (!login.equals(account.getLogin())) {
             throw new ForbiddenException("You are not own this review");
         }
     }

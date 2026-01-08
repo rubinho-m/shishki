@@ -7,6 +7,7 @@ import com.rubinho.shishki.jwt.JwtUtils;
 import com.rubinho.shishki.jwt.UserAuthProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -36,6 +37,9 @@ public class SecurityConfiguration {
 
     @Qualifier("handlerExceptionResolver")
     private final HandlerExceptionResolver resolver;
+
+    @Value("${frontend.url}")
+    private String frontendUrl;
 
     @Autowired
     public SecurityConfiguration(JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
@@ -84,7 +88,7 @@ public class SecurityConfiguration {
     @Primary
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOrigin("http://localhost:3000/");
+        configuration.addAllowedOrigin(frontendUrl);
         configuration.addAllowedMethod("*");
         configuration.addAllowedHeader("*");
         configuration.setAllowCredentials(true);

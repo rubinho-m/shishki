@@ -3,9 +3,11 @@ package com.rubinho.shishki.dto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Builder
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class GuestDto {
     private Long id;
