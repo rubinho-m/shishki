@@ -61,7 +61,7 @@ public class BookingServiceImpl implements BookingService {
     public List<BookingResponseDto> getAllByGlamping(Long glampingId, Account account) {
         return glampingRepository.findById(glampingId)
                 .map(glamping -> {
-                    if (!glamping.getOwner().equals(account)) {
+                    if (!account.equals(glamping.getOwner()) && !Role.ADMIN.equals(account.getRole())) {
                         throw new ForbiddenException("You are not the owner of this glamping");
                     }
                     return getAll()

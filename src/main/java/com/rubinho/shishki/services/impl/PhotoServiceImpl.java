@@ -78,12 +78,12 @@ public class PhotoServiceImpl implements PhotoService {
     }
 
     private void checkAccount(String fileName, Account account) {
-        if (account.getRole().equals(Role.ADMIN)) {
+        if (Role.ADMIN.equals(account.getRole())) {
             return;
         }
         final PhotoOwner photoOwner = photoOwnerRepository.getPhotoOwnerByFileName(fileName)
                 .orElseThrow(() -> new IllegalStateException("Not found photo: %s".formatted(fileName)));
-        if (!photoOwner.getOwner().equals(account)) {
+        if (!account.equals(photoOwner.getOwner())) {
             throw new ForbiddenException("You are not owner of this photo");
         }
     }
